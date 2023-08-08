@@ -17,7 +17,7 @@ after:
 
 ```tsx
 const element = new UIElement();
-element.widget = <image url={"http://somewhere.com/image.png"} color={[1, 1, 1, 0.75]} />;
+render(<image url={"http://somewhere.com/image.png"} color={[1, 1, 1, 0.75]} />, element);
 refObject.addUI(element);
 ```
 
@@ -34,11 +34,12 @@ Add the "jsx" and "jsxFactory" fields to compilerOptions, and be sure to include
 ```json
     {
         "compilerOptions" {
-            ...,
+            /* ... other compilerOptions ... */,
             "jsx": "react",
             "jsxFactory": "jsxInTTPG",
+            "jsxFragmentFactory": "jsxFrag"
         },
-        "include": [..., "./src/**/*.tsx"]
+        "include": [/* other includes */, "./src/**/*.tsx"]
     },
 
 ```
@@ -46,6 +47,54 @@ Add the "jsx" and "jsxFactory" fields to compilerOptions, and be sure to include
 additionally, you'll need to add this import at the top of any file that uses JSX
 
 `import { jsxInTTPG } from "jsx-in-ttpg";`
+
+## adding JSX to a UIElement or ScreenUIElement
+
+use the provider "render" function to add JSX to the UIElement/ScreenUIElement. The top-level JSX tag must be a vanilla widget (or a string or array string, since jsxInTTPG will wrap a lone string in a `<text>` widget automagically). This could also be a custom component, so long as any nested components resolving to a top-level widget.
+
+```tsx
+`import { render, jsxInTTPG, jsxFrag } from "jsx-in-ttpg";`;
+
+const ui = new UIElement();
+/* do stuff to set up ui element */
+
+render(<text>Hello There</text>, ui);
+```
+
+## Fragments
+
+a custom component should always return a single JSXNode (or a primitive, null, etc, etc). If it turns out that you need to return multiple elements, wrap the returned elements in a fragment. You will need to import {jsxFrag} from 'jsx-in-ttpg' to do so;
+
+```tsx
+`import { render, jsxInTTPG, jsxFrag } from "jsx-in-ttpg";`;
+
+const MyComponent = () => {
+    return (
+        <>
+            <horizontalbox>
+                <text>Hello</text>
+                <text>World</text>
+            </horizontalbox>
+            <horizontalbox>
+                <richtext>Some fancy [b]bolded[/b] text</richtext>
+            </horizontalbox>
+        </>
+    );
+};
+
+const ui = new UIElement();
+
+render(
+    <layout>
+        <verticalbox>
+            <MyComponent />
+        </verticalbox>
+    </layout>,
+    ui
+);
+
+refObject.addUI(ui);
+```
 
 # Syntax
 
@@ -496,7 +545,7 @@ const RobPanel = (props: { children?: SingleNode; title: TextNode; onClose?: () 
 };
 
 const element = new UIElement();
-element.widget = <RobPanel title={"My Model"}>Hi There</RobPanel>;
+render(<RobPanel title={"My Model"}>Hi There</RobPanel>, element);
 
 refObject.addUI(element);
 ```
@@ -524,7 +573,7 @@ const checkRef = () => {
     }
 };
 
-element.widget = (
+render(
     <border color={[0, 0, 0, 1]}>
         <verticalbox margin={10}>
             <layout maxWidth={240}>
@@ -534,7 +583,8 @@ element.widget = (
                 <button onClick={checkRef}>Check</button>
             </horizontalbox>
         </verticalbox>
-    </border>
+    </border>,
+    element
 );
 
 refObject.addUI(element);
@@ -552,7 +602,7 @@ const checkRef = () => {
     console.log(imageElement.getTintColor());
 };
 
-element.widget = (
+render(
     <border color={[0, 0, 0, 1]}>
         <verticalbox margin={10}>
             <layout maxWidth={240}>{imageElement}</layout>
@@ -560,7 +610,8 @@ element.widget = (
                 <button onClick={checkRef}>Check</button>
             </horizontalbox>
         </verticalbox>
-    </border>
+    </border>,
+    element
 );
 
 refObject.addUI(element);

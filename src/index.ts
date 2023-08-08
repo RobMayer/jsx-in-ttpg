@@ -1,5 +1,3 @@
-import "./jsx.d";
-
 import {
     Text,
     Border,
@@ -22,6 +20,12 @@ import {
     SelectionBox,
     Slider,
     TextBox,
+    HorizontalAlignment,
+    Player,
+    TextJustification,
+    VerticalAlignment,
+    UIElement,
+    ScreenUIElement,
 } from "@tabletop-playground/api";
 
 type CanvasChild<T> = {
@@ -48,18 +52,30 @@ export const useRef = <T extends Widget>(initial: T | null = null): RefHandle<T>
     return ref;
 };
 
+export const render = (widget: JSX.Element, element: UIElement | ScreenUIElement) => {
+    if (!(widget instanceof Widget)) {
+        throw Error("Top-level JSX.Element must be a widget");
+    }
+    element.widget = widget;
+};
+
+export const asTextNode = (children: JSXNode): TextNode => {
+    if (!(children instanceof Widget)) {
+        return children;
+    }
+    return undefined;
+};
+
 type ArrayOr<T> = T | T[];
 
+export type JSXNode = JSX.Element;
 export type RefHandle<T extends Widget> = { current: T | null; clear: () => void };
 export type RefObject<T extends Widget> = { current: T | null };
 
-export type SingleNode = Widget | ArrayOr<string | undefined | null | boolean | number>;
-export type MultiNode = ArrayOr<Widget | string | undefined | null | boolean | number>;
+type PossibleChildren = JSX.Element | ArrayOr<JSX.Element> | ArrayOr<BoxChild<JSX.Element>> | ArrayOr<CanvasChild<JSX.Element>> | TextNode;
 export type TextNode = ArrayOr<string | undefined | null | boolean | number>;
-export type BoxNode = ArrayOr<Widget | string | undefined | null | boolean | number | BoxChild<SingleNode>>;
-export type CanvasNode = ArrayOr<CanvasChild<SingleNode>>;
 
-export const boxChild = (weight: number, element: SingleNode): BoxChild<SingleNode> => {
+export const boxChild = (weight: number, element: JSX.Element): BoxChild<JSX.Element> => {
     return {
         tag: "boxchild",
         weight,
@@ -67,7 +83,7 @@ export const boxChild = (weight: number, element: SingleNode): BoxChild<SingleNo
     };
 };
 
-export const canvasChild = ({ x, y, width, height }: { x: number; y: number; width: number; height: number }, element: SingleNode): CanvasChild<SingleNode> => {
+export const canvasChild = ({ x, y, width, height }: { x: number; y: number; width: number; height: number }, element: JSX.Element): CanvasChild<JSX.Element> => {
     return {
         tag: "canvaschild",
         x,
@@ -120,8 +136,6 @@ const ensureWidgets = (...children: PossibleChildren[]): Widget[] => {
         return acc;
     }, []);
 };
-
-type PossibleChildren = SingleNode | MultiNode | TextNode | BoxNode | CanvasNode;
 
 const ensureCanvasChildren = (...children: PossibleChildren[]): CanvasChild<Widget>[] => {
     return children.reduce<CanvasChild<Widget>[]>((acc, child) => {
@@ -191,6 +205,13 @@ export const jsxInTTPG = (tag: ((props: any) => Widget) | keyof JSX.IntrinsicEle
     }
     const element = createElement(tag, props, children);
     return element;
+};
+
+export const jsxFrag = (props?: { [key: string]: any }, ...children: PossibleChildren[]): PossibleChildren | PossibleChildren[] => {
+    if (children.length === 1) {
+        return children[0];
+    }
+    return children;
 };
 
 const createElement = <const T extends keyof JSX.IntrinsicElements>(tag: T, attrs: { [key: string]: any }, children: PossibleChildren[]) => {
@@ -610,3 +631,305 @@ const INPUT_TYPES = {
     integer: 3,
     "positive-integer": 4,
 };
+
+declare global {
+    namespace JSX {
+        type Element = Widget | ArrayOr<string | undefined | null | boolean | number>;
+        interface ElementChildrenAttribute {
+            children: {};
+        }
+
+        interface IntrinsicElements {
+            image: {
+                ref?: { current: ImageWidget | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                onLoad?: (image: ImageWidget, filename: string, packageId: string) => void;
+                color?: Color | [number, number, number, number];
+                width?: number;
+                height?: number;
+                children?: never;
+            } & (
+                | { url: string }
+                | {
+                      card: Card;
+                  }
+                | {
+                      src: string;
+                      srcPackage?: string;
+                  }
+            );
+            imagebutton: {
+                ref?: { current: ImageButton | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                onLoad?: (image: ImageButton, filename: string, packageId: string) => void;
+                color?: Color | [number, number, number, number];
+                width?: number;
+                height?: number;
+                onClick?: (image: ImageButton, player: Player) => void;
+                children?: never;
+            } & (
+                | { url: string }
+                | {
+                      card: Card;
+                  }
+                | {
+                      src: string;
+                      srcPackage?: string;
+                  }
+            );
+            contentbutton: {
+                ref?: { current: ContentButton | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                onClick?: (image: ContentButton, player: Player) => void;
+                children?: JSX.Element;
+            };
+            border: {
+                ref?: { current: Border | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                color?: Color | [number, number, number, number];
+                children?: JSX.Element;
+            };
+            canvas: {
+                ref?: { current: Canvas | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                children?: ArrayOr<CanvasChild<JSX.Element>>;
+            };
+            horizontalbox: {
+                ref?: { current: HorizontalBox | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                gap?: number;
+                valign?: VerticalAlignment;
+                halign?: HorizontalAlignment;
+                children?: ArrayOr<JSX.Element | BoxChild<JSX.Element>>;
+            };
+            verticalbox: {
+                ref?: { current: VerticalBox | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                gap?: number;
+                valign?: VerticalAlignment;
+                halign?: HorizontalAlignment;
+                children?: ArrayOr<JSX.Element | BoxChild<JSX.Element>>;
+            };
+            layout: {
+                ref?: { current: LayoutBox | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                valign?: VerticalAlignment;
+                halign?: HorizontalAlignment;
+                padding?: {
+                    left?: number;
+                    right?: number;
+                    top?: number;
+                    bottom?: number;
+                };
+                maxHeight?: number;
+                minHeight?: number;
+                height?: number;
+                minWidth?: number;
+                maxWidth?: number;
+                width?: number;
+                children?: JSX.Element;
+            };
+            text: {
+                ref?: { current: Text | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                wrap?: boolean;
+                justify?: TextJustification;
+                children?: TextNode;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            button: {
+                ref?: { current: Button | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                onClick?: (button: Button, player: Player) => void;
+                children?: TextNode;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            checkbox: {
+                ref?: { current: CheckBox | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                onChange?: (checkbox: CheckBox, player: Player | undefined, state: boolean) => void;
+                checked?: boolean;
+                label?: string | string[];
+                children?: never;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            textarea: {
+                ref?: { current: MultilineTextBox | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                onChange?: (element: MultilineTextBox, player: Player | undefined, text: string) => void;
+                onCommit?: (element: MultilineTextBox, player: Player | undefined, text: string) => void;
+                maxLength?: number;
+                transparent?: boolean;
+                children?: TextNode;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            progressbar: {
+                ref?: { current: ProgressBar | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                wrap?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                value?: number;
+                label?: string | string[];
+                children?: never;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            richtext: {
+                ref?: { current: RichText | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                wrap?: boolean;
+                justify?: TextJustification;
+                children?: TextNode;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            select: {
+                ref?: { current: SelectionBox | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                onChange?: (element: SelectionBox, player: Player | undefined, index: number, option: string) => void;
+                value?: string;
+                options: string[];
+                children?: never;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            slider: {
+                ref?: { current: Slider | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                min?: number;
+                value?: number;
+                max?: number;
+                step?: number;
+                onChange?: (element: Slider, player: Player | undefined, value: number) => void;
+                inputWidth?: number;
+                children?: never;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+            input: {
+                ref?: { current: TextBox | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                bold?: boolean;
+                italic?: boolean;
+                size?: number;
+                color?: Color | [number, number, number, number];
+                onChange?: (element: TextBox, player: Player | undefined, text: string) => void;
+                onCommit?: (element: TextBox, player: Player | undefined, text: string, hardCommit: boolean) => void;
+                maxLength?: number;
+                transparent?: boolean;
+                selectOnFocus?: boolean;
+                value?: string;
+                type?: "string" | "float" | "positive-float" | "integer" | "positive-integer";
+                children?: never;
+            } & (
+                | {
+                      font?: string;
+                  }
+                | {
+                      font: string;
+                      fontPackage?: string;
+                  }
+            );
+        }
+    }
+}
