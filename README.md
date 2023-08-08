@@ -34,12 +34,12 @@ Add the "jsx" and "jsxFactory" fields to compilerOptions, and be sure to include
 ```json
     {
         "compilerOptions" {
-            /* ... other compilerOptions ... */,
             "jsx": "react",
             "jsxFactory": "jsxInTTPG",
-            "jsxFragmentFactory": "jsxFrag"
+            "jsxFragmentFactory": "jsxFrag",
+            /* ... other compilerOptions ... */
         },
-        "include": [/* other includes */, "./src/**/*.tsx"]
+        "include": ["./src/**/*.tsx", /* other includes */]
     },
 
 ```
@@ -50,10 +50,10 @@ additionally, you'll need to add this import at the top of any file that uses JS
 
 ## adding JSX to a UIElement or ScreenUIElement
 
-use the provider "render" function to add JSX to the UIElement/ScreenUIElement. The top-level JSX tag must be a vanilla widget (or a string or array string, since jsxInTTPG will wrap a lone string in a `<text>` widget automagically). This could also be a custom component, so long as any nested components resolving to a top-level widget.
+use the provided `render` function to add JSX to the UIElement/ScreenUIElement. The top-level JSX tag must be a vanilla widget (or a string or array string, since jsxInTTPG will wrap a lone string in a `<text>` widget automagically). This could also be a custom component, so long as any nested components resolve to a structure with a top-level widget.
 
 ```tsx
-`import { render, jsxInTTPG, jsxFrag } from "jsx-in-ttpg";`;
+import { render, jsxInTTPG } from "jsx-in-ttpg";
 
 const ui = new UIElement();
 /* do stuff to set up ui element */
@@ -63,10 +63,10 @@ render(<text>Hello There</text>, ui);
 
 ## Fragments
 
-a custom component should always return a single JSXNode (or a primitive, null, etc, etc). If it turns out that you need to return multiple elements, wrap the returned elements in a fragment. You will need to import {jsxFrag} from 'jsx-in-ttpg' to do so;
+a custom component should always return a single JSXNode (or a primitive, null, etc, etc). If it turns out that you need to return multiple elements, wrap the returned elements in a fragment `<>{...}</>`. You will need to `import {jsxFrag} from 'jsx-in-ttpg'` to do so
 
 ```tsx
-`import { render, jsxInTTPG, jsxFrag } from "jsx-in-ttpg";`;
+import { render, jsxInTTPG, jsxFrag } from "jsx-in-ttpg";
 
 const MyComponent = () => {
     return (
