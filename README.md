@@ -48,17 +48,25 @@ additionally, you'll need to add this import at the top of any file that uses JS
 
 `import { jsxInTTPG } from "jsx-in-ttpg";`
 
-## adding JSX to a UIElement or ScreenUIElement
+## adding JSX to a UIElement or ScreenUIElement or a vanilla Widget
 
-use the provided `renderUI` function to add JSX to the UIElement/ScreenUIElement. The top-level JSX tag must be a vanilla widget (or a string or array string, since jsxInTTPG will wrap a lone string in a `<text>` widget automagically). This could also be a custom component, so long as any nested components resolve to a structure with a top-level widget.
+use the provided `render` function to ensure a JSX tag is a Widget. The top-level JSX tag must be a vanilla widget (or a string or array string, since jsxInTTPG will wrap a lone string in a `<text>` widget automagically). This could also be a custom component, so long as any nested components resolve to a structure with a top-level widget.
 
 ```tsx
 import { render, jsxInTTPG } from "jsx-in-ttpg";
 
 const ui = new UIElement();
 /* do stuff to set up ui element */
+ui.widget = render(<text>Hello World</text>);
+refObject.addUI(ui);
+```
 
-renderUI(<text>Hello There</text>, ui);
+in instances where you need to set a new widget, or add a child, or if you want to mix-n-match JSX with vanilla TTPG elements, you can make use of the `render()` function in the same way:
+
+```tsx
+const layoutBox = new LayoutBox();
+
+layoutBox.setChild(render(<text>some text</text>));
 ```
 
 ## Fragments
@@ -84,42 +92,16 @@ const MyComponent = () => {
 
 const ui = new UIElement();
 
-renderUI(
+ui.widget = render(
     <layout>
         <verticalbox>
             <MyComponent />
         </verticalbox>
-    </layout>,
-    ui
+    </layout>
 );
 
 refObject.addUI(ui);
-
-/* note that renderUI returns the UIElement, so this could be further condensed like so, if you really want. */
-
-refObject.addUI(
-    renderUI(
-        <layout>
-            <verticalbox>
-                <MyComponent />
-            </verticalbox>
-        </layout>,
-        new UIElement()
-    )
-);
 ```
-
-## setting a widget property directly
-
-in instances where you need to set a new widget, or add a child, or if you want to mix-n-match JSX with vanilla TTPG elements, you need to make use of the provided `render()` function:
-
-```tsx
-const layoutBox = new LayoutBox();
-
-layoutBox.setChild(render(<text>some text</text>));
-```
-
-this garauntees that the JSX will return a widget, and not some other value type like a primitive (render will actually wrap that in a `<text>` element, if that's the case).
 
 # Syntax
 
@@ -215,7 +197,7 @@ The canvas has no additional attributes. however, canvases take an atypical chil
 
 -   `<canvas>` can take multiple `canvasChild` calls as children. the second argument of canvasChild can be a string or a single widget.
 
-### LayoutBox
+#### LayoutBox
 
 ```tsx
 <layout halign={HorizontalAlignment.Center} valign={VerticalAlignment.Middle} padding={{ left: 10, right: 10, top: 5, bottom: 5 }}>

@@ -52,14 +52,6 @@ export const useRef = <T extends Widget>(initial: T | null = null): RefHandle<T>
     return ref;
 };
 
-export const renderUI = (widget: JSX.Element, element: UIElement | ScreenUIElement) => {
-    if (!(widget instanceof Widget)) {
-        throw Error("Top-level JSX.Element must be a widget");
-    }
-    element.widget = widget;
-    return element;
-};
-
 export const asTextNode = (children: JSXNode): TextNode => {
     if (!(children instanceof Widget)) {
         return children;
