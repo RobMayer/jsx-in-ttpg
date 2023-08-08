@@ -552,7 +552,7 @@ const RobPanel = (props: { children?: SingleNode; title: TextNode; onClose?: () 
 };
 
 const element = new UIElement();
-render(<RobPanel title={"My Model"}>Hi There</RobPanel>, element);
+element.widget = render(<RobPanel title={"My Model"}>Hi There</RobPanel>);
 
 refObject.addUI(element);
 ```
@@ -580,7 +580,7 @@ const checkRef = () => {
     }
 };
 
-render(
+element.widget = render(
     <border color={[0, 0, 0, 1]}>
         <verticalbox margin={10}>
             <layout maxWidth={240}>
@@ -590,8 +590,7 @@ render(
                 <button onClick={checkRef}>Check</button>
             </horizontalbox>
         </verticalbox>
-    </border>,
-    element
+    </border>
 );
 
 refObject.addUI(element);
@@ -602,14 +601,14 @@ you can also just keep a reference to the widget the old-fashioned way, too, but
 ```tsx
 const layoutRef = useRef<LayoutBox>();
 
-const imageElement = <image url={"https://raw.githubusercontent.com/RobMayer/TTSLibrary/master/ads/offworldcolonies_h.jpg"} />;
+const imageElement = render(<image url={"https://raw.githubusercontent.com/RobMayer/TTSLibrary/master/ads/offworldcolonies_h.jpg"} />);
 
 const checkRef = () => {
     console.log(imageElement);
     console.log(imageElement.getTintColor());
 };
 
-render(
+element.widget = render(
     <border color={[0, 0, 0, 1]}>
         <verticalbox margin={10}>
             <layout maxWidth={240}>{imageElement}</layout>
@@ -617,8 +616,7 @@ render(
                 <button onClick={checkRef}>Check</button>
             </horizontalbox>
         </verticalbox>
-    </border>,
-    element
+    </border>
 );
 
 refObject.addUI(element);
