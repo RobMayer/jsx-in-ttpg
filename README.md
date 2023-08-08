@@ -50,7 +50,7 @@ additionally, you'll need to add this import at the top of any file that uses JS
 
 ## adding JSX to a UIElement or ScreenUIElement
 
-use the provided `render` function to add JSX to the UIElement/ScreenUIElement. The top-level JSX tag must be a vanilla widget (or a string or array string, since jsxInTTPG will wrap a lone string in a `<text>` widget automagically). This could also be a custom component, so long as any nested components resolve to a structure with a top-level widget.
+use the provided `renderUI` function to add JSX to the UIElement/ScreenUIElement. The top-level JSX tag must be a vanilla widget (or a string or array string, since jsxInTTPG will wrap a lone string in a `<text>` widget automagically). This could also be a custom component, so long as any nested components resolve to a structure with a top-level widget.
 
 ```tsx
 import { render, jsxInTTPG } from "jsx-in-ttpg";
@@ -58,7 +58,7 @@ import { render, jsxInTTPG } from "jsx-in-ttpg";
 const ui = new UIElement();
 /* do stuff to set up ui element */
 
-render(<text>Hello There</text>, ui);
+renderUI(<text>Hello There</text>, ui);
 ```
 
 ## Fragments
@@ -84,7 +84,7 @@ const MyComponent = () => {
 
 const ui = new UIElement();
 
-render(
+renderUI(
     <layout>
         <verticalbox>
             <MyComponent />
@@ -94,7 +94,32 @@ render(
 );
 
 refObject.addUI(ui);
+
+/* note that renderUI returns the UIElement, so this could be further condensed like so, if you really want. */
+
+refObject.addUI(
+    renderUI(
+        <layout>
+            <verticalbox>
+                <MyComponent />
+            </verticalbox>
+        </layout>,
+        new UIElement()
+    )
+);
 ```
+
+## setting a widget property directly
+
+in instances where you need to set a new widget, or add a child, or if you want to mix-n-match JSX with vanilla TTPG elements, you need to make use of the provided `render()` function:
+
+```tsx
+const layoutBox = new LayoutBox();
+
+layoutBox.setChild(render(<text>some text</text>));
+```
+
+this garauntees that the JSX will return a widget, and not some other value type like a primitive (render will actually wrap that in a `<text>` element, if that's the case).
 
 # Syntax
 

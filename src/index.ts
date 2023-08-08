@@ -52,11 +52,12 @@ export const useRef = <T extends Widget>(initial: T | null = null): RefHandle<T>
     return ref;
 };
 
-export const render = (widget: JSX.Element, element: UIElement | ScreenUIElement) => {
+export const renderUI = (widget: JSX.Element, element: UIElement | ScreenUIElement) => {
     if (!(widget instanceof Widget)) {
         throw Error("Top-level JSX.Element must be a widget");
     }
     element.widget = widget;
+    return element;
 };
 
 export const asTextNode = (children: JSXNode): TextNode => {
@@ -66,7 +67,7 @@ export const asTextNode = (children: JSXNode): TextNode => {
     return undefined;
 };
 
-export const asWidget = (children: JSXNode): Widget => {
+export const render = (children: JSXNode): Widget => {
     if (children instanceof Widget) {
         return children;
     }
