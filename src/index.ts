@@ -1,3 +1,5 @@
+import "./jsx.d";
+
 import {
     Text,
     Border,
