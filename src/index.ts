@@ -66,6 +66,15 @@ export const asTextNode = (children: JSXNode): TextNode => {
     return undefined;
 };
 
+export const asWidget = (children: JSXNode): Widget => {
+    if (children instanceof Widget) {
+        return children;
+    }
+    const t = new Text();
+    t.setText(Array.isArray(children) ? children.filter((a) => typeof a === "string").join("") : `${typeof children === "string" || typeof children === "number" ? children : ""}`);
+    return t;
+};
+
 type ArrayOr<T> = T | T[];
 
 export type JSXNode = JSX.Element;
