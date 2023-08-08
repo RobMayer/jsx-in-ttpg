@@ -1,0 +1,607 @@
+import {
+    Text,
+    Border,
+    Canvas,
+    ContentButton,
+    HorizontalBox,
+    ImageButton,
+    ImageWidget,
+    LayoutBox,
+    VerticalBox,
+    Widget,
+    Button,
+    CheckBox,
+    TextWidgetBase,
+    Color,
+    Card,
+    MultilineTextBox,
+    ProgressBar,
+    RichText,
+    SelectionBox,
+    Slider,
+    TextBox,
+} from "@tabletop-playground/api";
+
+type CanvasChild<T> = {
+    tag: "canvaschild";
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    element: T | undefined;
+};
+type BoxChild<T> = {
+    tag: "boxchild";
+    element: T | undefined;
+    weight?: number;
+};
+
+export const useRef = <T extends Widget>(initial: T | null = null): RefHandle<T> => {
+    const ref = {
+        current: initial,
+        clear: () => {
+            ref.current = null;
+        },
+    };
+    return ref;
+};
+
+type ArrayOr<T> = T | T[];
+
+export type RefHandle<T extends Widget> = { current: T | null; clear: () => void };
+export type RefObject<T extends Widget> = { current: T | null };
+
+export type SingleNode = Widget | ArrayOr<string | undefined | null | boolean | number>;
+export type MultiNode = ArrayOr<Widget | string | undefined | null | boolean | number>;
+export type TextNode = ArrayOr<string | undefined | null | boolean | number>;
+export type BoxNode = ArrayOr<Widget | string | undefined | null | boolean | number | BoxChild<SingleNode>>;
+export type CanvasNode = ArrayOr<CanvasChild<SingleNode>>;
+
+export const boxChild = (weight: number, element: SingleNode): BoxChild<SingleNode> => {
+    return {
+        tag: "boxchild",
+        weight,
+        element,
+    };
+};
+
+export const canvasChild = ({ x, y, width, height }: { x: number; y: number; width: number; height: number }, element: SingleNode): CanvasChild<SingleNode> => {
+    return {
+        tag: "canvaschild",
+        x,
+        y,
+        width,
+        height,
+        element,
+    };
+};
+
+/* prettier-ignore */
+export type JsxInTTPGElement<T extends Widget> = 
+    T extends Canvas ? JSX.IntrinsicElements["canvas"] : 
+    T extends ImageWidget ? JSX.IntrinsicElements["image"] : 
+    T extends ImageButton ? JSX.IntrinsicElements["imagebutton"] : 
+    T extends ContentButton ? JSX.IntrinsicElements["contentbutton"] : 
+    T extends Border ? JSX.IntrinsicElements["border"] : 
+    T extends HorizontalBox ? JSX.IntrinsicElements["horizontalbox"] : 
+    T extends VerticalBox ? JSX.IntrinsicElements["verticalbox"] : 
+    T extends LayoutBox ? JSX.IntrinsicElements["layout"] : 
+    T extends Text ? JSX.IntrinsicElements["text"] : 
+    T extends Button ? JSX.IntrinsicElements["button"] : 
+    T extends CheckBox ? JSX.IntrinsicElements["checkbox"] : 
+    T extends MultilineTextBox ? JSX.IntrinsicElements["textarea"] : 
+    T extends ProgressBar ? JSX.IntrinsicElements["progressbar"] : 
+    T extends RichText ? JSX.IntrinsicElements["richtext"] : 
+    T extends SelectionBox ? JSX.IntrinsicElements["select"] : 
+    T extends Slider ? JSX.IntrinsicElements["slider"] : 
+    T extends TextBox ? JSX.IntrinsicElements["input"] : 
+never;
+
+const ensureWidgets = (...children: PossibleChildren[]): Widget[] => {
+    return children.reduce<Widget[]>((acc, child) => {
+        if (child === null || child === undefined || typeof child === "boolean") {
+            return acc;
+        }
+        if (Array.isArray(child)) {
+            acc.push(...ensureWidgets(...child));
+        } else if (typeof child === "string" || typeof child === "number") {
+            const element = new Text();
+            element.setText(`${child}`);
+            acc.push(element);
+        } else if ("tag" in child) {
+            if ("element" in child) {
+                acc.push(...ensureWidgets(child.element));
+            }
+        } else {
+            acc.push(child);
+        }
+        return acc;
+    }, []);
+};
+
+type PossibleChildren = SingleNode | MultiNode | TextNode | BoxNode | CanvasNode;
+
+const ensureCanvasChildren = (...children: PossibleChildren[]): CanvasChild<Widget>[] => {
+    return children.reduce<CanvasChild<Widget>[]>((acc, child) => {
+        if (child === null || child === undefined || typeof child === "boolean" || typeof child === "string" || typeof child === "number") {
+            return acc;
+        } else if (Array.isArray(child)) {
+            acc.push(...ensureCanvasChildren(...child));
+        } else if ("tag" in child && child.tag === "canvaschild") {
+            acc.push({
+                ...child,
+                element: ensureWidgets(child)[0],
+            });
+        }
+        return acc;
+    }, []);
+};
+
+const ensureStrings = (...children: PossibleChildren[]): string[] => {
+    return children.reduce<string[]>((acc, child) => {
+        if (child === null || child === undefined || typeof child === "boolean") {
+            return acc;
+        } else if (Array.isArray(child)) {
+            acc.push(...ensureStrings(...child));
+        } else if (typeof child === "string" || typeof child === "number") {
+            acc.push(`${child}`);
+        }
+        return acc;
+    }, []);
+};
+
+const ensureBoxChildren = (children: PossibleChildren[]): (Widget | BoxChild<Widget>)[] => {
+    return children.reduce<(Widget | BoxChild<Widget>)[]>((acc, child) => {
+        if (child === null || child === undefined || typeof child === "boolean") {
+            return acc;
+        }
+        if (Array.isArray(child)) {
+            acc.push(...ensureWidgets(...child));
+        } else if (typeof child === "string" || typeof child === "number") {
+            const element = new Text();
+            element.setText(`${child}`);
+            acc.push(element);
+        } else if ("tag" in child) {
+            if (child.tag === "boxchild") {
+                acc.push({
+                    tag: child.tag,
+                    element: ensureWidgets(child.element)[0],
+                    weight: child.weight,
+                });
+            } else if ("element" in child) {
+                const el = ensureWidgets(child.element)[0];
+                if (el) {
+                    acc.push(el);
+                }
+            }
+        } else {
+            acc.push(child);
+        }
+        return acc;
+    }, []);
+};
+
+export const jsxInTTPG = (tag: ((props: any) => Widget) | keyof JSX.IntrinsicElements, props?: { [key: string]: any }, ...children: PossibleChildren[]): Widget | undefined => {
+    props = props ?? {};
+
+    if (typeof tag === "function") {
+        return tag({ ...props, children });
+    }
+    const element = createElement(tag, props, children);
+    return element;
+};
+
+const createElement = <const T extends keyof JSX.IntrinsicElements>(tag: T, attrs: { [key: string]: any }, children: PossibleChildren[]) => {
+    switch (tag) {
+        case "canvas":
+            return canvasElement(attrs as JSX.IntrinsicElements["canvas"], ensureCanvasChildren(...children));
+        case "border":
+            return borderElement(attrs as JSX.IntrinsicElements["border"], ensureWidgets(...children)[0]);
+        case "image":
+            return imageElement(attrs as JSX.IntrinsicElements["image"]);
+        case "imagebutton":
+            return imageButtonElement(attrs as JSX.IntrinsicElements["imagebutton"]);
+        case "horizontalbox":
+            return hboxElement(attrs as JSX.IntrinsicElements["horizontalbox"], ensureBoxChildren(children));
+        case "verticalbox":
+            return vboxElement(attrs as JSX.IntrinsicElements["verticalbox"], ensureBoxChildren(children));
+        case "layout":
+            return layoutElement(attrs as JSX.IntrinsicElements["layout"], ensureWidgets(...children)[0]);
+        case "contentbutton":
+            return contentButtonElement(attrs as JSX.IntrinsicElements["contentbutton"], ensureWidgets(...children)[0]);
+        case "text":
+            return textElement(attrs as JSX.IntrinsicElements["text"], ensureStrings(...children));
+        case "button":
+            return buttonElement(attrs as JSX.IntrinsicElements["button"], ensureStrings(...children));
+        case "checkbox":
+            return checkboxElement(attrs as JSX.IntrinsicElements["checkbox"]);
+        case "textarea":
+            return textareaElement(attrs as JSX.IntrinsicElements["textarea"], ensureStrings(...children));
+        case "progressbar":
+            return progressbarElement(attrs as JSX.IntrinsicElements["progressbar"]);
+        case "richtext":
+            return richtextElement(attrs as JSX.IntrinsicElements["richtext"], ensureStrings(...children));
+        case "select":
+            return selectElement(attrs as JSX.IntrinsicElements["select"]);
+        case "slider":
+            return sliderElement(attrs as JSX.IntrinsicElements["slider"]);
+        case "input":
+            return inputElement(attrs as JSX.IntrinsicElements["input"]);
+    }
+};
+
+const doCommon = <T extends Widget>(element: T, attrs: CommonElement<T>) => {
+    element.setVisible(!attrs?.hidden);
+    element.setEnabled(!attrs?.disabled);
+    if (attrs.ref) {
+        attrs.ref.current = element;
+    }
+};
+
+const doTextlike = <T extends TextWidgetBase>(element: T, attrs: TextlikeObject<T>) => {
+    element.setVisible(!attrs?.hidden);
+    element.setEnabled(!attrs?.disabled);
+    if (attrs.ref) {
+        attrs.ref.current = element;
+    }
+    if (attrs.color) {
+        element.setTextColor(attrs.color);
+    }
+    element.setBold(!!attrs.bold);
+    element.setItalic(!!attrs.italic);
+    if (attrs.size) {
+        element.setFontSize(attrs.size);
+    }
+    if (attrs.font) {
+        if ("package" in attrs) {
+            element.setFont(attrs.font, attrs.package);
+        } else {
+            element.setFont(attrs.font);
+        }
+    }
+};
+
+const doImagelike = <T extends ImageButton | ImageWidget>(element: T, attrs: ImagelikeObject<T>) => {
+    element.setVisible(!attrs?.hidden);
+    element.setEnabled(!attrs?.disabled);
+    if (attrs.ref) {
+        attrs.ref.current = element;
+    }
+    if (attrs.color) {
+        element.setTintColor(attrs.color);
+    }
+    if ("url" in attrs) {
+        element.setImageURL(attrs.url);
+    }
+    if ("image" in attrs) {
+        element.setImage(attrs.image, attrs.package);
+    }
+    if ("card" in attrs) {
+        element.setSourceCard(attrs.card);
+    }
+    element.setImageSize(attrs?.width ?? 0, attrs?.height ?? 0);
+};
+
+type CommonElement<T extends Widget> = {
+    ref?: RefObject<T>;
+    disabled?: boolean;
+    hidden?: boolean;
+};
+
+type TextlikeObject<T extends TextWidgetBase> = CommonElement<T> & {
+    bold?: boolean;
+    italic?: boolean;
+    wrap?: boolean;
+    size?: number;
+    color?: Color | [number, number, number, number];
+} & (
+        | {
+              font?: string;
+          }
+        | {
+              font: string;
+              package?: string;
+          }
+    );
+
+type ImagelikeObject<T extends ImageButton | ImageWidget> = CommonElement<T> & {
+    color?: Color | [number, number, number, number];
+    width?: number;
+    height?: number;
+} & (
+        | { url: string }
+        | {
+              card: Card;
+          }
+        | {
+              image: string;
+              package?: string;
+          }
+    );
+
+const imageElement = (attrs: JSX.IntrinsicElements["image"]) => {
+    const element = new ImageWidget();
+    doImagelike(element, attrs);
+    if (attrs.onLoad) {
+        element.onImageLoaded.add(attrs.onLoad);
+    }
+    return element;
+};
+
+const imageButtonElement = (attrs: JSX.IntrinsicElements["imagebutton"]) => {
+    const element = new ImageButton();
+    doImagelike(element, attrs);
+    if (attrs.onLoad) {
+        element.onImageLoaded.add(attrs.onLoad);
+    }
+    return element;
+};
+
+const canvasElement = (attrs: JSX.IntrinsicElements["canvas"], children: CanvasChild<Widget>[]) => {
+    const element = new Canvas();
+    doCommon(element, attrs);
+    children.forEach((child) => {
+        if (child.element) {
+            element.addChild(child.element, child.x, child.y, child.width, child.height);
+        }
+    });
+    return element;
+};
+
+const hboxElement = (attrs: JSX.IntrinsicElements["horizontalbox"], children: (BoxChild<Widget> | Widget)[]) => {
+    const element = new HorizontalBox();
+    doCommon(element, attrs);
+    if (attrs.margin) {
+        element.setChildDistance(attrs.margin);
+    }
+    if (attrs.halign) {
+        element.setHorizontalAlignment(attrs.halign);
+    }
+    if (attrs.valign) {
+        element.setVerticalAlignment(attrs.valign);
+    }
+    children.forEach((child) => {
+        if ("tag" in child) {
+            if (child.element) {
+                element.addChild(child.element, child.weight);
+            }
+        } else {
+            element.addChild(child);
+        }
+    });
+    return element;
+};
+
+const vboxElement = (attrs: JSX.IntrinsicElements["verticalbox"], children: (BoxChild<Widget> | Widget)[]) => {
+    const element = new VerticalBox();
+    doCommon(element, attrs);
+    if (attrs.margin) {
+        element.setChildDistance(attrs.margin);
+    }
+    if (attrs.halign) {
+        element.setHorizontalAlignment(attrs.halign);
+    }
+    if (attrs.valign) {
+        element.setVerticalAlignment(attrs.valign);
+    }
+    children.forEach((child) => {
+        if ("tag" in child) {
+            if (child.element) {
+                element.addChild(child.element, child.weight);
+            }
+        } else {
+            element.addChild(child);
+        }
+    });
+    return element;
+};
+
+const borderElement = (attrs: JSX.IntrinsicElements["border"], child?: Widget) => {
+    const element = new Border();
+    doCommon(element, attrs);
+    if (attrs.color) {
+        element.setColor(attrs.color);
+    }
+    if (child) {
+        element.setChild(child);
+    }
+    return element;
+};
+
+const layoutElement = (attrs: JSX.IntrinsicElements["layout"], child?: Widget) => {
+    const element = new LayoutBox();
+    doCommon(element, attrs);
+    if (child) {
+        element.setChild(child);
+    }
+    if (attrs.padding) {
+        element.setPadding(attrs.padding.left, attrs.padding.right, attrs.padding.top, attrs.padding.bottom);
+    }
+    if (attrs.halign) {
+        element.setHorizontalAlignment(attrs.halign);
+    }
+    if (attrs.valign) {
+        element.setVerticalAlignment(attrs.valign);
+    }
+    if (attrs.minWidth) {
+        element.setMinimumWidth(attrs.minWidth);
+    }
+    if (attrs.maxWidth) {
+        element.setMaximumWidth(attrs.maxWidth);
+    }
+    if (attrs.width) {
+        element.setOverrideWidth(attrs.width);
+    }
+    if (attrs.minHeight) {
+        element.setMinimumHeight(attrs.minHeight);
+    }
+    if (attrs.maxHeight) {
+        element.setMaximumHeight(attrs.maxHeight);
+    }
+    if (attrs.height) {
+        element.setOverrideHeight(attrs.height);
+    }
+    return element;
+};
+
+const contentButtonElement = (attrs: JSX.IntrinsicElements["contentbutton"], child?: Widget) => {
+    const element = new ContentButton();
+    doCommon(element, attrs);
+    if (attrs.onClick) {
+        element.onClicked.add(attrs.onClick);
+    }
+    if (child) {
+        element.setChild(child);
+    }
+    return element;
+};
+
+const textElement = (attrs: JSX.IntrinsicElements["text"], children?: string[]) => {
+    const element = new Text();
+    doTextlike(element, attrs);
+    if (children) {
+        element.setText(children?.join(""));
+    }
+    element.setAutoWrap(!!attrs.wrap);
+    if (attrs.justify) {
+        element.setJustification(attrs.justify);
+    }
+    return element;
+};
+
+const buttonElement = (attrs: JSX.IntrinsicElements["button"], children?: string[]) => {
+    const element = new Button();
+    doTextlike(element, attrs);
+    if (attrs.onClick) {
+        element.onClicked.add(attrs.onClick);
+    }
+    if (children) {
+        element.setText(children?.join(""));
+    }
+    return element;
+};
+
+const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"]) => {
+    const element = new CheckBox();
+    doTextlike(element, attrs);
+    if (attrs.label) {
+        element.setText(Array.isArray(attrs.label) ? attrs.label.join("") : attrs.label);
+    }
+    if (attrs.onChange) {
+        element.onCheckStateChanged.add(attrs.onChange);
+    }
+    element.setIsChecked(!!attrs.checked);
+    return element;
+};
+
+const textareaElement = (attrs: JSX.IntrinsicElements["textarea"], children?: string[]) => {
+    const element = new MultilineTextBox();
+    doTextlike(element, attrs);
+    if (children) {
+        element.setText(children?.join(""));
+    }
+    if (attrs.onChange) {
+        element.onTextChanged.add(attrs.onChange);
+    }
+    if (attrs.onCommit) {
+        element.onTextCommitted.add(attrs.onCommit);
+    }
+    return element;
+};
+
+const progressbarElement = (attrs: JSX.IntrinsicElements["progressbar"]) => {
+    const element = new ProgressBar();
+    doTextlike(element, attrs);
+    if (attrs.label) {
+        element.setText(Array.isArray(attrs.label) ? attrs.label.join("") : attrs.label);
+    }
+    if (attrs.value) {
+        element.setProgress(attrs.value);
+    }
+    return element;
+};
+
+const richtextElement = (attrs: JSX.IntrinsicElements["richtext"], children?: string[]) => {
+    const element = new RichText();
+    doTextlike(element, attrs);
+    if (children) {
+        element.setText(children?.join("\n"));
+    }
+    element.setAutoWrap(!!attrs.wrap);
+    if (attrs.justify) {
+        element.setJustification(attrs.justify);
+    }
+    return element;
+};
+
+const selectElement = (attrs: JSX.IntrinsicElements["select"]) => {
+    const element = new SelectionBox();
+    doTextlike(element, attrs);
+    element.setOptions(attrs.options);
+    if (attrs.value) {
+        element.setSelectedOption(attrs.value);
+    }
+    if (attrs.onChange) {
+        element.onSelectionChanged.add(attrs.onChange);
+    }
+    return element;
+};
+
+const sliderElement = (attrs: JSX.IntrinsicElements["slider"]) => {
+    const element = new Slider();
+    doTextlike(element, attrs);
+    if (attrs.onChange) {
+        element.onValueChanged.add(attrs.onChange);
+    }
+    if (attrs.min) {
+        element.setMinValue(attrs.min);
+    }
+    if (attrs.max) {
+        element.setMaxValue(attrs.max);
+    }
+    if (attrs.step) {
+        element.setStepSize(attrs.step);
+    }
+    if (attrs.inputWidth) {
+        element.setTextBoxWidth(attrs.inputWidth);
+    }
+    if (attrs.value) {
+        element.setValue(attrs.value);
+    }
+    return element;
+};
+
+const inputElement = (attrs: JSX.IntrinsicElements["input"]) => {
+    const element = new TextBox();
+    doTextlike(element, attrs);
+    if (attrs.onChange) {
+        element.onTextChanged.add(attrs.onChange);
+    }
+    if (attrs.onCommit) {
+        element.onTextCommitted.add(attrs.onCommit);
+    }
+    if (attrs.selectOnFocus) {
+        element.setSelectTextOnFocus(attrs.selectOnFocus);
+    }
+    if (attrs.transparent) {
+        element.setBackgroundTransparent(attrs.transparent);
+    }
+    if (attrs.maxLength) {
+        element.setMaxLength(attrs.maxLength);
+    }
+    if (attrs.value) {
+        element.setText(attrs.value);
+    }
+    if (attrs.type) {
+        element.setInputType(INPUT_TYPES[attrs.type]);
+    }
+    return element;
+};
+
+const INPUT_TYPES = {
+    string: 0,
+    float: 1,
+    "positive-float": 2,
+    integer: 3,
+    "positive-integer": 4,
+};
