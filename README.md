@@ -17,7 +17,7 @@ after:
 
 ```tsx
 const element = new UIElement();
-render(<image url={"http://somewhere.com/image.png"} color={[1, 1, 1, 0.75]} />, element);
+element.widget = render(<image url={"http://somewhere.com/image.png"} color={[1, 1, 1, 0.75]} />);
 refObject.addUI(element);
 ```
 
