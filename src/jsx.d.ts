@@ -23,8 +23,8 @@ declare global {
                       card: import("@tabletop-playground/api").Card;
                   }
                 | {
-                      image: string;
-                      package?: string;
+                      src: string;
+                      srcPackage?: string;
                   }
             );
             imagebutton: {
@@ -43,8 +43,8 @@ declare global {
                       card: import("@tabletop-playground/api").Card;
                   }
                 | {
-                      image: string;
-                      package?: string;
+                      src: string;
+                      srcPackage?: string;
                   }
             );
             contentbutton: {
@@ -71,7 +71,7 @@ declare global {
                 ref?: { current: import("@tabletop-playground/api").HorizontalBox | null };
                 disabled?: boolean;
                 hidden?: boolean;
-                margin?: number;
+                gap?: number;
                 valign?: import("@tabletop-playground/api").VerticalAlignment;
                 halign?: import("@tabletop-playground/api").HorizontalAlignment;
                 children?: import(".").BoxNode;
@@ -80,7 +80,7 @@ declare global {
                 ref?: { current: import("@tabletop-playground/api").VerticalBox | null };
                 disabled?: boolean;
                 hidden?: boolean;
-                margin?: number;
+                gap?: number;
                 valign?: import("@tabletop-playground/api").VerticalAlignment;
                 halign?: import("@tabletop-playground/api").HorizontalAlignment;
                 children?: import(".").BoxNode;
@@ -122,7 +122,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             button: {
@@ -141,7 +141,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             checkbox: {
@@ -162,7 +162,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             textarea: {
@@ -184,7 +184,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             progressbar: {
@@ -205,7 +205,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             richtext: {
@@ -225,7 +225,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             select: {
@@ -246,7 +246,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             slider: {
@@ -270,7 +270,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
             input: {
@@ -295,7 +295,7 @@ declare global {
                   }
                 | {
                       font: string;
-                      package?: string;
+                      fontPackage?: string;
                   }
             );
         }

@@ -255,8 +255,8 @@ const doTextlike = <T extends TextWidgetBase>(element: T, attrs: TextlikeObject<
         element.setFontSize(attrs.size);
     }
     if (attrs.font) {
-        if ("package" in attrs) {
-            element.setFont(attrs.font, attrs.package);
+        if ("fontPackage" in attrs) {
+            element.setFont(attrs.font, attrs.fontPackage);
         } else {
             element.setFont(attrs.font);
         }
@@ -275,8 +275,8 @@ const doImagelike = <T extends ImageButton | ImageWidget>(element: T, attrs: Ima
     if ("url" in attrs) {
         element.setImageURL(attrs.url);
     }
-    if ("image" in attrs) {
-        element.setImage(attrs.image, attrs.package);
+    if ("src" in attrs) {
+        element.setImage(attrs.src, attrs.srcPackage);
     }
     if ("card" in attrs) {
         element.setSourceCard(attrs.card);
@@ -302,7 +302,7 @@ type TextlikeObject<T extends TextWidgetBase> = CommonElement<T> & {
           }
         | {
               font: string;
-              package?: string;
+              fontPackage?: string;
           }
     );
 
@@ -316,8 +316,8 @@ type ImagelikeObject<T extends ImageButton | ImageWidget> = CommonElement<T> & {
               card: Card;
           }
         | {
-              image: string;
-              package?: string;
+              src: string;
+              srcPackage?: string;
           }
     );
 
@@ -336,6 +336,9 @@ const imageButtonElement = (attrs: JSX.IntrinsicElements["imagebutton"]) => {
     if (attrs.onLoad) {
         element.onImageLoaded.add(attrs.onLoad);
     }
+    if (attrs.onClick) {
+        element.onClicked.add(attrs.onClick);
+    }
     return element;
 };
 
@@ -353,8 +356,8 @@ const canvasElement = (attrs: JSX.IntrinsicElements["canvas"], children: CanvasC
 const hboxElement = (attrs: JSX.IntrinsicElements["horizontalbox"], children: (BoxChild<Widget> | Widget)[]) => {
     const element = new HorizontalBox();
     doCommon(element, attrs);
-    if (attrs.margin) {
-        element.setChildDistance(attrs.margin);
+    if (attrs.gap) {
+        element.setChildDistance(attrs.gap);
     }
     if (attrs.halign) {
         element.setHorizontalAlignment(attrs.halign);
@@ -377,8 +380,8 @@ const hboxElement = (attrs: JSX.IntrinsicElements["horizontalbox"], children: (B
 const vboxElement = (attrs: JSX.IntrinsicElements["verticalbox"], children: (BoxChild<Widget> | Widget)[]) => {
     const element = new VerticalBox();
     doCommon(element, attrs);
-    if (attrs.margin) {
-        element.setChildDistance(attrs.margin);
+    if (attrs.gap) {
+        element.setChildDistance(attrs.gap);
     }
     if (attrs.halign) {
         element.setHorizontalAlignment(attrs.halign);
