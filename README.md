@@ -96,7 +96,7 @@ Note that boolean-type attributes don't require you to put the actual true/false
 -   `width` - `number`: Equivilent to calling `imagewidget.setWidth(...)`.
 -   `height` - `number`: Equivilent to calling `imagewidget.setHeight(...)`.
 
--   <image> takes no children
+-   `<image>` takes no children
 
 #### ImageButton
 
@@ -114,7 +114,7 @@ Note that boolean-type attributes don't require you to put the actual true/false
 -   `width` - `number`: Equivilent to calling `imagewidget.setWidth(...)`.
 -   `height` - `number`: Equivilent to calling `imagewidget.setHeight(...)`.
 
--   <imagebutton> takes no children
+-   `<imagebutton>` takes no children
 
 #### Border
 
@@ -126,7 +126,7 @@ Note that boolean-type attributes don't require you to put the actual true/false
 
 -   `color` - `[number, number, number, number]` or `Color`: Equivalent to calling `border.setColor(...)`.
 
--   <border> can take strings or a single widget as children.
+-   `<border>` can take strings or a single widget as children.
 
 #### Canvas
 
@@ -139,7 +139,7 @@ The canvas has no additional attributes. however, canvases take an atypical chil
 </canvas>
 ```
 
--   <canvas> can take multiple `canvasChild` calls as children. the second argument of canvasChild can be a string or a single widget.
+-   `<canvas>` can take multiple `canvasChild` calls as children. the second argument of canvasChild can be a string or a single widget.
 
 ### LayoutBox
 
@@ -159,7 +159,7 @@ The canvas has no additional attributes. however, canvases take an atypical chil
 -   `minWidth` - `number`: Equivalent to calling `layoutBox.setMinimumWidth(...)`.
 -   `width` - `number`: Equivalent to calling `layoutBox.setOverrideWidth(...)`.
 
--   <layout> can take strings or a single widget as children.
+-   `<layout>` can take strings or a single widget as children.
 
 #### VerticalBox
 
@@ -177,7 +177,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `valign` - `VerticalAlignment`: Equivalent to calling `verticalBox.setVerticalAlignment(...)`.
 -   `halign` - `HorizontalAlignment`: Equivalent to calling `verticalBox.setHorizontalAlignment(...)`.
 
--   <verticalbox> can take strings, any number of widgets, or the special {boxChild(1, <...>)} function.
+-   `<verticalbox>` can take strings, any number of widgets, or the special {boxChild(1, <...>)} function.
 
 #### HorizontalBox
 
@@ -192,7 +192,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `valign` - `VerticalAlignment`: Equivalent to calling `verticalBox.setVerticalAlignment(...)`.
 -   `halign` - `HorizontalAlignment`: Equivalent to calling `verticalBox.setHorizontalAlignment(...)`.
 
--   <horizontalbox>, like <verticalbox>, can take strings, any number of widgets, or the special {boxChild(1, <...>)} function.
+-   `<horizontalbox>`, like `<verticalbox>`, can take strings, any number of widgets, or the special {boxChild(1, <...>)} function.
 
 #### ContentButton
 
@@ -230,7 +230,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <text> obviously takes a string as a child
+-   `<text>` obviously takes a string as a child
 
 #### Button
 
@@ -259,7 +259,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <button> can take a string as a child
+-   `<button>` can take a string as a child
 
 #### CheckBox
 
@@ -290,7 +290,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <checkbox> takes no children
+-   `<checkbox>` takes no children
 
 #### MultilineTextBox
 
@@ -325,7 +325,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <textarea> can take a string as a child
+-   `<textarea>` can take a string as a child
 
 #### ProgressBar
 
@@ -343,7 +343,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <progressbar> takes no children
+-   `<progressbar>` takes no children
 
 #### RichText
 
@@ -362,7 +362,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <richtext> can take a string as it's child.
+-   `<richtext>` can take a string as it's child.
 
 #### SelectionBox (Select)
 
@@ -393,7 +393,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <select> takes no children
+-   `<select>` takes no children
 
 #### Slider
 
@@ -432,7 +432,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <slider> takes no children
+-   `<slider>` takes no children
 
 #### TextBox
 
@@ -470,7 +470,7 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
 
--   <input> takes no children
+-   `<input>` takes no children
 
 # Extendable Component-esque functions
 
