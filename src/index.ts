@@ -24,8 +24,8 @@ import {
     Player,
     TextJustification,
     VerticalAlignment,
-    UIElement,
-    ScreenUIElement,
+    WebBrowser,
+    WidgetSwitcher,
 } from "@tabletop-playground/api";
 
 type CanvasChild<T> = {
@@ -42,7 +42,7 @@ type BoxChild<T> = {
     weight?: number;
 };
 
-export const useRef = <T extends Widget>(initial: T | null = null): RefHandle<T> => {
+export const useRef = <T>(initial: T | null = null): RefHandle<T> => {
     const ref = {
         current: initial,
         clear: () => {
@@ -71,8 +71,8 @@ export const render = (children: JSXNode): Widget => {
 type ArrayOr<T> = T | T[];
 
 export type JSXNode = JSX.Element;
-export type RefHandle<T extends Widget> = { current: T | null; clear: () => void };
-export type RefObject<T extends Widget> = { current: T | null };
+export type RefHandle<T> = { current: T | null; clear: () => void };
+export type RefObject<T> = { current: T | null };
 
 type PossibleChildren = JSX.Element | ArrayOr<JSX.Element> | ArrayOr<BoxChild<JSX.Element>> | ArrayOr<CanvasChild<JSX.Element>> | TextNode;
 export type TextNode = ArrayOr<string | undefined | null | boolean | number>;
@@ -115,6 +115,8 @@ export type JsxInTTPGElement<T extends Widget> =
     T extends SelectionBox ? JSX.IntrinsicElements["select"] : 
     T extends Slider ? JSX.IntrinsicElements["slider"] : 
     T extends TextBox ? JSX.IntrinsicElements["input"] : 
+    T extends WebBrowser ? JSX.IntrinsicElements["browser"] : 
+    T extends WidgetSwitcher ? JSX.IntrinsicElements["switch"] : 
 never;
 
 const ensureWidgets = (...children: PossibleChildren[]): Widget[] => {
@@ -252,6 +254,10 @@ const createElement = <const T extends keyof JSX.IntrinsicElements>(tag: T, attr
             return sliderElement(attrs as JSX.IntrinsicElements["slider"]);
         case "input":
             return inputElement(attrs as JSX.IntrinsicElements["input"]);
+        case "browser":
+            return browserElement(attrs as JSX.IntrinsicElements["browser"]);
+        case "switch":
+            return switchElement(attrs as JSX.IntrinsicElements["switch"], ensureWidgets(...children));
     }
 };
 
@@ -626,6 +632,40 @@ const inputElement = (attrs: JSX.IntrinsicElements["input"]) => {
     return element;
 };
 
+const browserElement = (attrs: JSX.IntrinsicElements["browser"]) => {
+    const element = new WebBrowser();
+    doCommon(element, attrs);
+    if (attrs.onChange) {
+        element.onURLChanged.add(attrs.onChange);
+    }
+    if (attrs.onLoadFinish) {
+        element.onLoadFinished.add(attrs.onLoadFinish);
+    }
+    if (attrs.onLoadStart) {
+        element.onLoadStarted.add(attrs.onLoadStart);
+    }
+    if (attrs.url) {
+        element.setURL(attrs.url);
+    }
+    return element;
+};
+
+const switchElement = (attrs: JSX.IntrinsicElements["switch"], children?: Widget[]) => {
+    const element = new WidgetSwitcher();
+    doCommon(element, attrs);
+    if (attrs.value) {
+        if (attrs.value instanceof Widget) {
+            element.setActiveWidget(attrs.value);
+        } else {
+            element.setActiveIndex(attrs.value);
+        }
+    }
+    if (children) {
+        children.forEach(element.addChild);
+    }
+    return element;
+};
+
 const INPUT_TYPES = {
     string: 0,
     float: 1,
@@ -932,6 +972,23 @@ declare global {
                       fontPackage?: string;
                   }
             );
+            browser: {
+                ref?: { current: WebBrowser | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                onLoadStart?: () => void;
+                onLoadFinish?: () => void;
+                onChange?: () => void;
+                url?: string;
+                children?: never;
+            };
+            switch: {
+                ref?: { current: WidgetSwitcher | null };
+                disabled?: boolean;
+                hidden?: boolean;
+                children?: ArrayOr<JSX.Element>;
+                value?: number | Widget;
+            };
         }
     }
 }
