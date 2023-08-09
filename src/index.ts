@@ -747,10 +747,10 @@ declare global {
                 height?: number;
                 children?: never;
             } & (
-                | { url: string }
-                | { card: Card }
+                | { url?: string }
+                | { card?: Card }
                 | {
-                      src: string;
+                      src?: string;
                       srcPackage?: string;
                   }
             );
@@ -765,10 +765,10 @@ declare global {
                 onClick?: (image: ImageButton, player: Player) => void;
                 children?: never;
             } & (
-                | { url: string }
-                | { card: Card }
+                | { url?: string }
+                | { card?: Card }
                 | {
-                      src: string;
+                      src?: string;
                       srcPackage?: string;
                   }
             );
