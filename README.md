@@ -207,7 +207,7 @@ The canvas has no additional attributes. however, canvases take an atypical chil
 
 -   `valign` - `VerticalAlignment`: Equivalent to calling `layoutBox.setVerticalAlignment(...)`.
 -   `halign` - `HorizontalAlignment`: Equivalent to calling `layoutBox.setHorizontalAlignment(...)`.
--   `padding` - `{ left?: number, right?: number, top?: number, bottom?: number }`: Equivalent to calling `layoutBox.setPadding(...)`.
+-   `padding` - `number | { left?: number, right?: number, top?: number, bottom?: number }`: Equivalent to calling `layoutBox.setPadding(...)` if a single number is used, it is applied to all four directions.
 -   `maxHeight` - `number`: Equivalent to calling `layoutBox.setMaximumHeight(...)`.
 -   `minHeight` - `number`: Equivalent to calling `layoutBox.setMinimumHeight(...)`.
 -   `height` - `number`: Equivalent to calling `layoutBox.setOverrideHeight(...)`.
@@ -340,7 +340,8 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `italic` - `boolean`: Equivalent to calling `checkbox.setItalic(...)`.
 -   `size` - `number`: Equivalent to calling `checkbox.setFontSize(...)`.
 -   `color` - `[number, number, number, number]` or `Color`: Equivalent to calling `checkbox.setTextColor(...)`.
--   `onChange` - `(checkbox: CheckBox, player: Player | undefined, state: boolean) => void`: Equivalent to adding a change event handler using `onCheckStateChanged.add(...)`.
+-   `onChange` - `(checkbox: CheckBox, player: Player, state: boolean) => void`: Equivalent to adding a change event handler using `onCheckStateChanged.add(...)` but will only trigger on user input, not on programmatic input.
+-   `onChangeActual` - `(checkbox: CheckBox, player: Player | undefined, state: boolean) => void`: Equivalent to adding a change event handler using `onCheckStateChanged.add(...)`.
 -   `checked` - `boolean`: Equivalent to calling `checkbox.setIsChecked(...)`.
 -   `label` - `string` or `string[]`: Equivalent to setting the checkbox label using `setText(...)`.
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
@@ -374,8 +375,10 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `italic` - `boolean`: Equivalent to calling `multilineTextBox.setItalic(...)`.
 -   `size` - `number`: Equivalent to calling `multilineTextBox.setFontSize(...)`.
 -   `color` - `[number, number, number, number]` or `Color`: Equivalent to calling `multilineTextBox.setTextColor(...)`.
--   `onChange` - `(element: MultilineTextBox, player: Player | undefined, text: string) => void`: Equivalent to adding a change event handler using `onTextChanged.add(...)`.
--   `onCommit` - `(element: MultilineTextBox, player: Player | undefined, text: string) => void`: Equivalent to adding a commit event handler using `onTextCommitted.add(...)`.
+-   `onChange` - `(element: MultilineTextBox, player: Player, text: string) => void`: Equivalent to adding a change event handler using `onTextChanged.add(...)` but will only trigger on user interaction, not programatic interaction.
+-   `onChangeActual` - `(element: MultilineTextBox, player: Player | undefined, text: string) => void`: Equivalent to adding a change event handler using `onTextChanged.add(...)`.
+-   `onCommit` - `(element: MultilineTextBox, player: Player, text: string) => void`: Equivalent to adding a commit event handler using `onTextCommitted.add(...)` but will only trigger on user interaction, not programatic interaction.
+-   `onCommitActual` - `(element: MultilineTextBox, player: Player | undefined, text: string) => void`: Equivalent to adding a commit event handler using `onTextCommitted.add(...)`.
 -   `maxLength` - `number`: Equivalent to setting the maximum length of the text using `setMaxLength(...)`.
 -   `transparent` - `boolean`: Equivalent to calling `multilineTextBox.setTransparent(...)`.
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
@@ -443,7 +446,8 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `italic` - `boolean`: Equivalent to calling `selectionBox.setItalic(...)`.
 -   `size` - `number`: Equivalent to calling `selectionBox.setFontSize(...)`.
 -   `color` - `[number, number, number, number]` or `Color`: Equivalent to calling `selectionBox.setTextColor(...)`.
--   `onChange` - `(element: SelectionBox, player: Player | undefined, index: number, option: string) => void`: Equivalent to adding a change event handler using `onSelectionChanged.add(...)`.
+-   `onChange` - `(element: SelectionBox, player: Player, index: number, option: string) => void`: Equivalent to adding a change event handler using `onSelectionChanged.add(...)` but will only trigger on user interaction, not programatic interaction.
+-   `onChangeActual` - `(element: SelectionBox, player: Player | undefined, index: number, option: string) => void`: Equivalent to adding a change event handler using `onSelectionChanged.add(...)`.
 -   `value` - `string`: Equivalent to setting the selected option using `setSelectedOption(...)`.
 -   `options` - `string[]`: An array of available options for the selection box.
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
@@ -483,7 +487,8 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `value` - `number`: Equivalent to setting the current value using `setValue(...)`.
 -   `max` - `number`: Equivalent to setting the maximum value using `setMaxValue(...)`.
 -   `step` - `number`: Equivalent to setting the step size using `setStepSize(...)`.
--   `onChange` - `(element: Slider, player: Player | undefined, value: number) => void`: Equivalent to adding a change event handler using `onValueChanged.add(...)`.
+-   `onChange` - `(element: Slider, player: Player, value: number) => void`: Equivalent to adding a change event handler using `onValueChanged.add(...)` but will only trigger on user interaction, not programatic interaction.
+-   `onChangeActual` - `(element: Slider, player: Player | undefined, value: number) => void`: Equivalent to adding a change event handler using `onValueChanged.add(...)`.
 -   `inputWidth` - `number`: Equivalent to setting the width of the input box using `setTextBoxWidth(...)`.
 -   `font` - `string`: Equivalent to setting the font using `setFont(...)`.
 -   `fontPackage` - `string`: Equivalent to setting the font package using `setFont(...)` with a package specifier.
@@ -516,8 +521,10 @@ VerticalBox (as well as the HorizontalBox) can take a special function child, mu
 -   `italic` - `boolean`: Equivalent to calling `textBox.setItalic(...)`.
 -   `size` - `number`: Equivalent to calling `textBox.setFontSize(...)`.
 -   `color` - `[number, number, number, number]` or `Color`: Equivalent to calling `textBox.setTextColor(...)`.
--   `onChange` - `(element: TextBox, player: Player | undefined, text: string) => void`: Equivalent to adding a change event handler using `onTextChanged.add(...)`.
--   `onCommit` - `(element: TextBox, player: Player | undefined, text: string, hardCommit: boolean) => void`: Equivalent to adding a commit event handler using `onTextCommitted.add(...)`.
+-   `onChange` - `(element: TextBox, player: Player, text: string) => void`: Equivalent to adding a change event handler using `onTextChanged.add(...)` but will only trigger on user interaction, not programatic interaction.
+-   `onChangeActual` - `(element: TextBox, player: Player | undefined, text: string) => void`: Equivalent to adding a change event handler using `onTextChanged.add(...)`.
+-   `onCommit` - `(element: TextBox, player: Player, text: string, hardCommit: boolean) => void`: Equivalent to adding a commit event handler using `onTextCommitted.add(...)` but will only trigger on user interaction, not programatic interaction.
+-   `onCommitActual` - `(element: TextBox, player: Player | undefined, text: string, hardCommit: boolean) => void`: Equivalent to adding a commit event handler using `onTextCommitted.add(...)`.
 -   `maxLength` - `number`: Equivalent to setting the maximum length of the text using `setMaxLength(...)`.
 -   `transparent` - `boolean`: Equivalent to calling `textBox.setBackgroundTransparent(...)`.
 -   `selectOnFocus` - `boolean`: Equivalent to calling `textBox.setSelectTextOnFocus(...)`.
@@ -582,7 +589,7 @@ const checkRef = () => {
 
 element.widget = render(
     <border color={[0, 0, 0, 1]}>
-        <verticalbox margin={10}>
+        <verticalbox gap={10}>
             <layout maxWidth={240}>
                 <image ref={imageRef} url={"https://raw.githubusercontent.com/RobMayer/TTSLibrary/master/ads/offworldcolonies_h.jpg"} />
             </layout>
@@ -610,7 +617,7 @@ const checkRef = () => {
 
 element.widget = render(
     <border color={[0, 0, 0, 1]}>
-        <verticalbox margin={10}>
+        <verticalbox gap={10}>
             <layout maxWidth={240}>{imageElement}</layout>
             <horizontalbox>
                 <button onClick={checkRef}>Check</button>

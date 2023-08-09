@@ -301,13 +301,17 @@ const doImagelike = <T extends ImageButton | ImageWidget>(element: T, attrs: Ima
     if (attrs.color) {
         element.setTintColor(attrs.color);
     }
-    if ("url" in attrs) {
+    if ("url" in attrs && attrs.url) {
         element.setImageURL(attrs.url);
     }
-    if ("src" in attrs) {
-        element.setImage(attrs.src, attrs.srcPackage);
+    if ("src" in attrs && attrs.src) {
+        if ("srcPackage" in attrs && attrs.srcPackage) {
+            element.setImage(attrs.src, attrs.srcPackage);
+        } else {
+            element.setImage(attrs.src);
+        }
     }
-    if ("card" in attrs) {
+    if ("card" in attrs && attrs.card) {
         element.setSourceCard(attrs.card);
     }
     element.setImageSize(attrs?.width ?? 0, attrs?.height ?? 0);
@@ -326,9 +330,7 @@ type TextlikeObject<T extends TextWidgetBase> = CommonElement<T> & {
     size?: number;
     color?: Color | [number, number, number, number];
 } & (
-        | {
-              font?: string;
-          }
+        | { font?: string }
         | {
               font: string;
               fontPackage?: string;
@@ -340,10 +342,9 @@ type ImagelikeObject<T extends ImageButton | ImageWidget> = CommonElement<T> & {
     width?: number;
     height?: number;
 } & (
-        | { url: string }
-        | {
-              card: Card;
-          }
+        | { url?: string }
+        | { card?: Card }
+        | { src?: string }
         | {
               src: string;
               srcPackage?: string;
@@ -449,7 +450,11 @@ const layoutElement = (attrs: JSX.IntrinsicElements["layout"], child?: Widget) =
         element.setChild(child);
     }
     if (attrs.padding) {
-        element.setPadding(attrs.padding.left, attrs.padding.right, attrs.padding.top, attrs.padding.bottom);
+        if (typeof attrs.padding === "number") {
+            element.setPadding(attrs.padding, attrs.padding, attrs.padding, attrs.padding);
+        } else {
+            element.setPadding(attrs.padding.left, attrs.padding.right, attrs.padding.top, attrs.padding.bottom);
+        }
     }
     if (attrs.halign) {
         element.setHorizontalAlignment(attrs.halign);
@@ -522,7 +527,14 @@ const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"]) => {
         element.setText(Array.isArray(attrs.label) ? attrs.label.join("") : attrs.label);
     }
     if (attrs.onChange) {
-        element.onCheckStateChanged.add(attrs.onChange);
+        element.onCheckStateChanged.add((s, p, v) => {
+            if (p !== undefined) {
+                attrs.onChange?.(s, p, v);
+            }
+        });
+    }
+    if (attrs.onChangeActual) {
+        element.onCheckStateChanged.add(attrs.onChangeActual);
     }
     element.setIsChecked(!!attrs.checked);
     return element;
@@ -535,10 +547,24 @@ const textareaElement = (attrs: JSX.IntrinsicElements["textarea"], children?: st
         element.setText(children?.join(""));
     }
     if (attrs.onChange) {
-        element.onTextChanged.add(attrs.onChange);
+        element.onTextChanged.add((s, p, v) => {
+            if (p !== undefined) {
+                attrs.onChange?.(s, p, v);
+            }
+        });
+    }
+    if (attrs.onChangeActual) {
+        element.onTextChanged.add(attrs.onChangeActual);
     }
     if (attrs.onCommit) {
-        element.onTextCommitted.add(attrs.onCommit);
+        element.onTextCommitted.add((s, p, v) => {
+            if (p !== undefined) {
+                attrs.onCommit?.(s, p, v);
+            }
+        });
+    }
+    if (attrs.onCommitActual) {
+        element.onTextCommitted.add(attrs.onCommitActual);
     }
     return element;
 };
@@ -576,7 +602,14 @@ const selectElement = (attrs: JSX.IntrinsicElements["select"]) => {
         element.setSelectedOption(attrs.value);
     }
     if (attrs.onChange) {
-        element.onSelectionChanged.add(attrs.onChange);
+        element.onSelectionChanged.add((s, p, i, v) => {
+            if (p !== undefined) {
+                attrs.onChange?.(s, p, i, v);
+            }
+        });
+    }
+    if (attrs.onChangeActual) {
+        element.onSelectionChanged.add(attrs.onChangeActual);
     }
     return element;
 };
@@ -585,7 +618,14 @@ const sliderElement = (attrs: JSX.IntrinsicElements["slider"]) => {
     const element = new Slider();
     doTextlike(element, attrs);
     if (attrs.onChange) {
-        element.onValueChanged.add(attrs.onChange);
+        element.onValueChanged.add((s, p, v) => {
+            if (p !== undefined) {
+                attrs.onChange?.(s, p, v);
+            }
+        });
+    }
+    if (attrs.onChangeActual) {
+        element.onValueChanged.add(attrs.onChangeActual);
     }
     if (attrs.min) {
         element.setMinValue(attrs.min);
@@ -608,11 +648,26 @@ const sliderElement = (attrs: JSX.IntrinsicElements["slider"]) => {
 const inputElement = (attrs: JSX.IntrinsicElements["input"]) => {
     const element = new TextBox();
     doTextlike(element, attrs);
+
     if (attrs.onChange) {
-        element.onTextChanged.add(attrs.onChange);
+        element.onTextChanged.add((s, p, v) => {
+            if (p !== undefined) {
+                attrs.onChange?.(s, p, v);
+            }
+        });
+    }
+    if (attrs.onChangeActual) {
+        element.onTextChanged.add(attrs.onChangeActual);
     }
     if (attrs.onCommit) {
-        element.onTextCommitted.add(attrs.onCommit);
+        element.onTextCommitted.add((s, p, v, h) => {
+            if (p !== undefined) {
+                attrs.onCommit?.(s, p, v, h);
+            }
+        });
+    }
+    if (attrs.onCommitActual) {
+        element.onTextCommitted.add(attrs.onCommitActual);
     }
     if (attrs.selectOnFocus) {
         element.setSelectTextOnFocus(attrs.selectOnFocus);
@@ -693,9 +748,7 @@ declare global {
                 children?: never;
             } & (
                 | { url: string }
-                | {
-                      card: Card;
-                  }
+                | { card: Card }
                 | {
                       src: string;
                       srcPackage?: string;
@@ -713,9 +766,7 @@ declare global {
                 children?: never;
             } & (
                 | { url: string }
-                | {
-                      card: Card;
-                  }
+                | { card: Card }
                 | {
                       src: string;
                       srcPackage?: string;
@@ -765,12 +816,14 @@ declare global {
                 hidden?: boolean;
                 valign?: VerticalAlignment;
                 halign?: HorizontalAlignment;
-                padding?: {
-                    left?: number;
-                    right?: number;
-                    top?: number;
-                    bottom?: number;
-                };
+                padding?:
+                    | number
+                    | {
+                          left?: number;
+                          right?: number;
+                          top?: number;
+                          bottom?: number;
+                      };
                 maxHeight?: number;
                 minHeight?: number;
                 height?: number;
@@ -791,9 +844,7 @@ declare global {
                 justify?: TextJustification;
                 children?: TextNode;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -810,9 +861,7 @@ declare global {
                 onClick?: (button: Button, player: Player) => void;
                 children?: TextNode;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -826,14 +875,13 @@ declare global {
                 italic?: boolean;
                 size?: number;
                 color?: Color | [number, number, number, number];
-                onChange?: (checkbox: CheckBox, player: Player | undefined, state: boolean) => void;
+                onChange?: (checkbox: CheckBox, player: Player, state: boolean) => void;
+                onChangeActual?: (checkbox: CheckBox, player: Player | undefined, state: boolean) => void;
                 checked?: boolean;
                 label?: string | string[];
                 children?: never;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -847,15 +895,15 @@ declare global {
                 italic?: boolean;
                 size?: number;
                 color?: Color | [number, number, number, number];
-                onChange?: (element: MultilineTextBox, player: Player | undefined, text: string) => void;
-                onCommit?: (element: MultilineTextBox, player: Player | undefined, text: string) => void;
+                onChange?: (element: MultilineTextBox, player: Player, text: string) => void;
+                onChangeActual?: (element: MultilineTextBox, player: Player | undefined, text: string) => void;
+                onCommit?: (element: MultilineTextBox, player: Player, text: string) => void;
+                onCommitActual?: (element: MultilineTextBox, player: Player | undefined, text: string) => void;
                 maxLength?: number;
                 transparent?: boolean;
                 children?: TextNode;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -874,9 +922,7 @@ declare global {
                 label?: string | string[];
                 children?: never;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -894,9 +940,7 @@ declare global {
                 justify?: TextJustification;
                 children?: TextNode;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -910,14 +954,13 @@ declare global {
                 italic?: boolean;
                 size?: number;
                 color?: Color | [number, number, number, number];
-                onChange?: (element: SelectionBox, player: Player | undefined, index: number, option: string) => void;
+                onChange?: (element: SelectionBox, player: Player, index: number, option: string) => void;
+                onChangeActual?: (element: SelectionBox, player: Player | undefined, index: number, option: string) => void;
                 value?: string;
                 options: string[];
                 children?: never;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -935,13 +978,12 @@ declare global {
                 value?: number;
                 max?: number;
                 step?: number;
-                onChange?: (element: Slider, player: Player | undefined, value: number) => void;
+                onChange?: (element: Slider, player: Player, value: number) => void;
+                onChangeActual?: (element: Slider, player: Player | undefined, value: number) => void;
                 inputWidth?: number;
                 children?: never;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
@@ -955,8 +997,10 @@ declare global {
                 italic?: boolean;
                 size?: number;
                 color?: Color | [number, number, number, number];
-                onChange?: (element: TextBox, player: Player | undefined, text: string) => void;
-                onCommit?: (element: TextBox, player: Player | undefined, text: string, hardCommit: boolean) => void;
+                onChange?: (element: TextBox, player: Player, text: string) => void;
+                onChangeActual?: (element: TextBox, player: Player | undefined, text: string) => void;
+                onCommit?: (element: TextBox, player: Player, text: string, hardCommit: boolean) => void;
+                onCommitActual?: (element: TextBox, player: Player | undefined, text: string, hardCommit: boolean) => void;
                 maxLength?: number;
                 transparent?: boolean;
                 selectOnFocus?: boolean;
@@ -964,9 +1008,7 @@ declare global {
                 type?: "string" | "float" | "positive-float" | "integer" | "positive-integer";
                 children?: never;
             } & (
-                | {
-                      font?: string;
-                  }
+                | { font?: string }
                 | {
                       font: string;
                       fontPackage?: string;
