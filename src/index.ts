@@ -78,7 +78,7 @@ const parseColor = (value: IColor) => {
         return hexToColor(value);
     }
     if (value.startsWith("r")) {
-        return hexToColor(value, 0.45);
+        return hexToColor(value, 2.2);
     }
     return undefined;
 };
