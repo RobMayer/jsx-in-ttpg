@@ -282,7 +282,7 @@ const createElement = <const T extends keyof JSX.IntrinsicElements>(tag: T, attr
         case "button":
             return buttonElement(attrs as JSX.IntrinsicElements["button"], ensureStrings(...children));
         case "checkbox":
-            return checkboxElement(attrs as JSX.IntrinsicElements["checkbox"]);
+            return checkboxElement(attrs as JSX.IntrinsicElements["checkbox"], ensureStrings(...children));
         case "textarea":
             return textareaElement(attrs as JSX.IntrinsicElements["textarea"], ensureStrings(...children));
         case "progressbar":
@@ -570,7 +570,7 @@ const buttonElement = (attrs: JSX.IntrinsicElements["button"], children?: string
     return element;
 };
 
-const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"]) => {
+const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"], children?: string[]) => {
     const element = new CheckBox();
     doTextlike(element, attrs);
     if (attrs.label) {
@@ -585,6 +585,9 @@ const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"]) => {
     }
     if (attrs.onChangeActual) {
         element.onCheckStateChanged.add(attrs.onChangeActual);
+    }
+    if (children) {
+        element.setText(children?.join(""));
     }
     element.setIsChecked(!!attrs.checked);
     return element;
@@ -929,7 +932,7 @@ declare global {
                 onChangeActual?: (checkbox: CheckBox, player: Player | undefined, state: boolean) => void;
                 checked?: boolean;
                 label?: string | string[];
-                children?: never;
+                children?: TextNode;
             } & (
                 | { font?: string }
                 | {
