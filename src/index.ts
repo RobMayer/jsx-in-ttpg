@@ -42,6 +42,47 @@ type BoxChild<T> = {
     weight?: number;
 };
 
+type IColor = Color | [number, number, number, number] | string;
+
+export const hexToColor = (h: string, pow: number = 1) => {
+    h = h.slice(1);
+    if (h.length === 3) {
+        h = h + "f";
+    }
+    if (h.length === 4) {
+        h = `${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}${h[3]}${h[3]}`;
+    }
+    if (h.length === 6) {
+        h = h + "ff";
+    }
+
+    const r = Math.pow(parseInt(h.slice(0, 2), 16) / 255, pow);
+    const g = Math.pow(parseInt(h.slice(2, 4), 16) / 255, pow);
+    const b = Math.pow(parseInt(h.slice(4, 6), 16) / 255, pow);
+    const a = Math.pow(parseInt(h.slice(6, 8), 16) / 255, pow);
+
+    if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) {
+        return undefined;
+    }
+    return new Color(r, g, b, a);
+};
+
+const parseColor = (value: IColor) => {
+    if (value instanceof Color) {
+        return value;
+    }
+    if (Array.isArray(value)) {
+        return new Color(value[0], value[1], value[2], value[3]);
+    }
+    if (value.startsWith("#")) {
+        return hexToColor(value);
+    }
+    if (value.startsWith("r")) {
+        return hexToColor(value, 0.45);
+    }
+    return undefined;
+};
+
 export const useRef = <T>(initial: T | null = null): RefHandle<T> => {
     const ref = {
         current: initial,
@@ -276,7 +317,10 @@ const doTextlike = <T extends TextWidgetBase>(element: T, attrs: TextlikeObject<
         attrs.ref.current = element;
     }
     if (attrs.color) {
-        element.setTextColor(attrs.color);
+        const t = parseColor(attrs.color);
+        if (t) {
+            element.setTextColor(t);
+        }
     }
     element.setBold(!!attrs.bold);
     element.setItalic(!!attrs.italic);
@@ -299,7 +343,10 @@ const doImagelike = <T extends ImageButton | ImageWidget>(element: T, attrs: Ima
         attrs.ref.current = element;
     }
     if (attrs.color) {
-        element.setTintColor(attrs.color);
+        const t = parseColor(attrs.color);
+        if (t) {
+            element.setTintColor(t);
+        }
     }
     if ("url" in attrs && attrs.url) {
         element.setImageURL(attrs.url);
@@ -328,7 +375,7 @@ type TextlikeObject<T extends TextWidgetBase> = CommonElement<T> & {
     italic?: boolean;
     wrap?: boolean;
     size?: number;
-    color?: Color | [number, number, number, number];
+    color?: IColor;
 } & (
         | { font?: string }
         | {
@@ -338,7 +385,7 @@ type TextlikeObject<T extends TextWidgetBase> = CommonElement<T> & {
     );
 
 type ImagelikeObject<T extends ImageButton | ImageWidget> = CommonElement<T> & {
-    color?: Color | [number, number, number, number];
+    color?: IColor;
     width?: number;
     height?: number;
 } & (
@@ -435,7 +482,10 @@ const borderElement = (attrs: JSX.IntrinsicElements["border"], child?: Widget) =
     const element = new Border();
     doCommon(element, attrs);
     if (attrs.color) {
-        element.setColor(attrs.color);
+        const t = parseColor(attrs.color);
+        if (t) {
+            element.setColor(t);
+        }
     }
     if (child) {
         element.setChild(child);
@@ -742,7 +792,7 @@ declare global {
                 disabled?: boolean;
                 hidden?: boolean;
                 onLoad?: (image: ImageWidget, filename: string, packageId: string) => void;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 width?: number;
                 height?: number;
                 children?: never;
@@ -759,7 +809,7 @@ declare global {
                 disabled?: boolean;
                 hidden?: boolean;
                 onLoad?: (image: ImageButton, filename: string, packageId: string) => void;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 width?: number;
                 height?: number;
                 onClick?: (image: ImageButton, player: Player) => void;
@@ -783,7 +833,7 @@ declare global {
                 ref?: { current: Border | null };
                 disabled?: boolean;
                 hidden?: boolean;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 children?: JSX.Element;
             };
             canvas: {
@@ -839,7 +889,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 wrap?: boolean;
                 justify?: TextJustification;
                 children?: TextNode;
@@ -857,7 +907,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 onClick?: (button: Button, player: Player) => void;
                 children?: TextNode;
             } & (
@@ -874,7 +924,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 onChange?: (checkbox: CheckBox, player: Player, state: boolean) => void;
                 onChangeActual?: (checkbox: CheckBox, player: Player | undefined, state: boolean) => void;
                 checked?: boolean;
@@ -894,7 +944,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 onChange?: (element: MultilineTextBox, player: Player, text: string) => void;
                 onChangeActual?: (element: MultilineTextBox, player: Player | undefined, text: string) => void;
                 onCommit?: (element: MultilineTextBox, player: Player, text: string) => void;
@@ -917,7 +967,7 @@ declare global {
                 italic?: boolean;
                 wrap?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 value?: number;
                 label?: string | string[];
                 children?: never;
@@ -935,7 +985,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 wrap?: boolean;
                 justify?: TextJustification;
                 children?: TextNode;
@@ -953,7 +1003,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 onChange?: (element: SelectionBox, player: Player, index: number, option: string) => void;
                 onChangeActual?: (element: SelectionBox, player: Player | undefined, index: number, option: string) => void;
                 value?: string;
@@ -973,7 +1023,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 min?: number;
                 value?: number;
                 max?: number;
@@ -996,7 +1046,7 @@ declare global {
                 bold?: boolean;
                 italic?: boolean;
                 size?: number;
-                color?: Color | [number, number, number, number];
+                color?: IColor;
                 onChange?: (element: TextBox, player: Player, text: string) => void;
                 onChangeActual?: (element: TextBox, player: Player | undefined, text: string) => void;
                 onCommit?: (element: TextBox, player: Player, text: string, hardCommit: boolean) => void;
