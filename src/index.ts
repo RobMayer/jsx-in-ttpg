@@ -111,6 +111,8 @@ export const render = (children: JSXNode): Widget => {
 
 type ArrayOr<T> = T | T[];
 
+type RefValue<T> = { current: T | null } | ((o: T) => void);
+
 export type JSXNode = JSX.Element;
 export type RefHandle<T> = { current: T | null; clear: () => void };
 export type RefObject<T> = { current: T | null };
@@ -306,7 +308,11 @@ const doCommon = <T extends Widget>(element: T, attrs: CommonElement<T>) => {
     element.setVisible(!attrs?.hidden);
     element.setEnabled(!attrs?.disabled);
     if (attrs.ref) {
-        attrs.ref.current = element;
+        if (typeof attrs.ref === "function") {
+            attrs.ref(element);
+        } else {
+            attrs.ref.current = element;
+        }
     }
 };
 
@@ -314,7 +320,11 @@ const doTextlike = <T extends TextWidgetBase>(element: T, attrs: TextlikeObject<
     element.setVisible(!attrs?.hidden);
     element.setEnabled(!attrs?.disabled);
     if (attrs.ref) {
-        attrs.ref.current = element;
+        if (typeof attrs.ref === "function") {
+            attrs.ref(element);
+        } else {
+            attrs.ref.current = element;
+        }
     }
     if (attrs.color) {
         const t = parseColor(attrs.color);
@@ -340,7 +350,11 @@ const doImagelike = <T extends ImageButton | ImageWidget>(element: T, attrs: Ima
     element.setVisible(!attrs?.hidden);
     element.setEnabled(!attrs?.disabled);
     if (attrs.ref) {
-        attrs.ref.current = element;
+        if (typeof attrs.ref === "function") {
+            attrs.ref(element);
+        } else {
+            attrs.ref.current = element;
+        }
     }
     if (attrs.color) {
         const t = parseColor(attrs.color);
@@ -365,7 +379,7 @@ const doImagelike = <T extends ImageButton | ImageWidget>(element: T, attrs: Ima
 };
 
 type CommonElement<T extends Widget> = {
-    ref?: RefObject<T>;
+    ref?: RefValue<T>;
     disabled?: boolean;
     hidden?: boolean;
 };
