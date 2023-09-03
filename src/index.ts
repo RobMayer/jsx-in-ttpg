@@ -805,7 +805,7 @@ declare global {
 
         interface IntrinsicElements {
             image: {
-                ref?: { current: ImageWidget | null };
+                ref?: RefValue<ImageWidget>;
                 disabled?: boolean;
                 hidden?: boolean;
                 onLoad?: (image: ImageWidget, filename: string, packageId: string) => void;
@@ -822,7 +822,7 @@ declare global {
                   }
             );
             imagebutton: {
-                ref?: { current: ImageButton | null };
+                ref?: RefValue<ImageButton>;
                 disabled?: boolean;
                 hidden?: boolean;
                 onLoad?: (image: ImageButton, filename: string, packageId: string) => void;
@@ -840,27 +840,27 @@ declare global {
                   }
             );
             contentbutton: {
-                ref?: { current: ContentButton | null };
+                ref?: RefValue<ContentButton>;
                 disabled?: boolean;
                 hidden?: boolean;
                 onClick?: (image: ContentButton, player: Player) => void;
                 children?: JSX.Element;
             };
             border: {
-                ref?: { current: Border | null };
+                ref?: RefValue<Border>;
                 disabled?: boolean;
                 hidden?: boolean;
                 color?: IColor;
                 children?: JSX.Element;
             };
             canvas: {
-                ref?: { current: Canvas | null };
+                ref?: RefValue<Canvas>;
                 disabled?: boolean;
                 hidden?: boolean;
                 children?: ArrayOr<CanvasChild<JSX.Element>>;
             };
             horizontalbox: {
-                ref?: { current: HorizontalBox | null };
+                ref?: RefValue<HorizontalBox>;
                 disabled?: boolean;
                 hidden?: boolean;
                 gap?: number;
@@ -869,7 +869,7 @@ declare global {
                 children?: ArrayOr<JSX.Element | BoxChild<JSX.Element>>;
             };
             verticalbox: {
-                ref?: { current: VerticalBox | null };
+                ref?: RefValue<VerticalBox>;
                 disabled?: boolean;
                 hidden?: boolean;
                 gap?: number;
@@ -878,7 +878,7 @@ declare global {
                 children?: ArrayOr<JSX.Element | BoxChild<JSX.Element>>;
             };
             layout: {
-                ref?: { current: LayoutBox | null };
+                ref?: RefValue<LayoutBox>;
                 disabled?: boolean;
                 hidden?: boolean;
                 valign?: VerticalAlignment;
@@ -900,7 +900,7 @@ declare global {
                 children?: JSX.Element;
             };
             text: {
-                ref?: { current: Text | null };
+                ref?: RefValue<Text>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -918,7 +918,7 @@ declare global {
                   }
             );
             button: {
-                ref?: { current: Button | null };
+                ref?: RefValue<Button>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -935,7 +935,7 @@ declare global {
                   }
             );
             checkbox: {
-                ref?: { current: CheckBox | null };
+                ref?: RefValue<CheckBox>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -955,7 +955,7 @@ declare global {
                   }
             );
             textarea: {
-                ref?: { current: MultilineTextBox | null };
+                ref?: RefValue<MultilineTextBox>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -977,7 +977,7 @@ declare global {
                   }
             );
             progressbar: {
-                ref?: { current: ProgressBar | null };
+                ref?: RefValue<ProgressBar>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -996,7 +996,7 @@ declare global {
                   }
             );
             richtext: {
-                ref?: { current: RichText | null };
+                ref?: RefValue<RichText>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -1014,7 +1014,7 @@ declare global {
                   }
             );
             select: {
-                ref?: { current: SelectionBox | null };
+                ref?: RefValue<SelectionBox>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -1034,7 +1034,7 @@ declare global {
                   }
             );
             slider: {
-                ref?: { current: Slider | null };
+                ref?: RefValue<Slider>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -1057,7 +1057,7 @@ declare global {
                   }
             );
             input: {
-                ref?: { current: TextBox | null };
+                ref?: RefValue<TextBox>;
                 disabled?: boolean;
                 hidden?: boolean;
                 bold?: boolean;
@@ -1082,7 +1082,7 @@ declare global {
                   }
             );
             browser: {
-                ref?: { current: WebBrowser | null };
+                ref?: RefValue<WebBrowser>;
                 disabled?: boolean;
                 hidden?: boolean;
                 onLoadStart?: () => void;
@@ -1092,7 +1092,7 @@ declare global {
                 children?: never;
             };
             switch: {
-                ref?: { current: WidgetSwitcher | null };
+                ref?: RefValue<WidgetSwitcher>;
                 disabled?: boolean;
                 hidden?: boolean;
                 children?: ArrayOr<JSX.Element>;
