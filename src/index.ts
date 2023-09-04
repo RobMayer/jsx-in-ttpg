@@ -67,8 +67,12 @@ export const hexToColor = (h: string, pow: number = 1) => {
     return new Color(r, g, b, a);
 };
 
+const isColor = (c: any): c is Color => {
+    return typeof c?.r === "number" && typeof c?.g === "number" && typeof c?.b === "number" && typeof c?.a === "number";
+};
+
 const parseColor = (value: IColor) => {
-    if (value instanceof Color) {
+    if (isColor(value)) {
         return value;
     }
     if (Array.isArray(value)) {
