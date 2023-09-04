@@ -776,7 +776,7 @@ const switchElement = (attrs: JSX.IntrinsicElements["switch"], children?: Widget
     const element = new WidgetSwitcher();
     doCommon(element, attrs);
     if (children) {
-        children.forEach(element.addChild);
+        children.forEach((c) => element.addChild(c));
     }
     if (attrs.value) {
         if (attrs.value instanceof Widget) {
