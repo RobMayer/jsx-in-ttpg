@@ -646,7 +646,7 @@ const progressbarElement = (attrs: JSX.IntrinsicElements["progressbar"]) => {
     if (attrs.label) {
         element.setText(Array.isArray(attrs.label) ? attrs.label.join("") : attrs.label);
     }
-    if (attrs.value) {
+    if (attrs.value !== undefined) {
         element.setProgress(attrs.value);
     }
     return element;
