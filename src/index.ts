@@ -604,7 +604,7 @@ const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"], children?: st
     if (attrs.onChangeActual) {
         element.onCheckStateChanged.add(attrs.onChangeActual);
     }
-    if (children) {
+    if (children && children.length > 0) {
         element.setText(children?.join(""));
     }
     element.setIsChecked(!!attrs.checked);
@@ -669,9 +669,7 @@ const selectElement = (attrs: JSX.IntrinsicElements["select"]) => {
     const element = new SelectionBox();
     doTextlike(element, attrs);
     element.setOptions(attrs.options);
-    if (attrs.value) {
-        element.setSelectedOption(attrs.value);
-    }
+    element.setSelectedOption(attrs.value ?? attrs.options[0] ?? "");
     if (attrs.onChange) {
         element.onSelectionChanged.add((s, p, i, v) => {
             if (p !== undefined) {
@@ -698,12 +696,8 @@ const sliderElement = (attrs: JSX.IntrinsicElements["slider"]) => {
     if (attrs.onChangeActual) {
         element.onValueChanged.add(attrs.onChangeActual);
     }
-    if (attrs.min !== undefined) {
-        element.setMinValue(attrs.min);
-    }
-    if (attrs.max !== undefined) {
-        element.setMaxValue(attrs.max);
-    }
+    element.setMinValue(attrs.min ?? 0);
+    element.setMaxValue(attrs.max ?? 1);
     if (attrs.step !== undefined) {
         element.setStepSize(attrs.step);
     }
