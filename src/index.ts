@@ -451,7 +451,7 @@ const canvasElement = (attrs: JSX.IntrinsicElements["canvas"], children: CanvasC
 const hboxElement = (attrs: JSX.IntrinsicElements["horizontalbox"], children: (BoxChild<Widget> | Widget)[]) => {
     const element = new HorizontalBox();
     doCommon(element, attrs);
-    if (attrs.gap) {
+    if (attrs.gap !== undefined) {
         element.setChildDistance(attrs.gap);
     }
     if (attrs.halign) {
@@ -475,7 +475,7 @@ const hboxElement = (attrs: JSX.IntrinsicElements["horizontalbox"], children: (B
 const vboxElement = (attrs: JSX.IntrinsicElements["verticalbox"], children: (BoxChild<Widget> | Widget)[]) => {
     const element = new VerticalBox();
     doCommon(element, attrs);
-    if (attrs.gap) {
+    if (attrs.gap !== undefined) {
         element.setChildDistance(attrs.gap);
     }
     if (attrs.halign) {
@@ -591,7 +591,7 @@ const buttonElement = (attrs: JSX.IntrinsicElements["button"], children?: string
 const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"], children?: string[]) => {
     const element = new CheckBox();
     doTextlike(element, attrs);
-    if (attrs.label) {
+    if (attrs.label !== undefined) {
         element.setText(Array.isArray(attrs.label) ? attrs.label.join("") : attrs.label);
     }
     if (attrs.onChange) {
@@ -698,19 +698,19 @@ const sliderElement = (attrs: JSX.IntrinsicElements["slider"]) => {
     if (attrs.onChangeActual) {
         element.onValueChanged.add(attrs.onChangeActual);
     }
-    if (attrs.min) {
+    if (attrs.min !== undefined) {
         element.setMinValue(attrs.min);
     }
-    if (attrs.max) {
+    if (attrs.max !== undefined) {
         element.setMaxValue(attrs.max);
     }
-    if (attrs.step) {
+    if (attrs.step !== undefined) {
         element.setStepSize(attrs.step);
     }
-    if (attrs.inputWidth) {
+    if (attrs.inputWidth !== undefined) {
         element.setTextBoxWidth(attrs.inputWidth);
     }
-    if (attrs.value) {
+    if (attrs.value !== undefined) {
         element.setValue(attrs.value);
     }
     return element;
@@ -746,10 +746,10 @@ const inputElement = (attrs: JSX.IntrinsicElements["input"]) => {
     if (attrs.transparent) {
         element.setBackgroundTransparent(attrs.transparent);
     }
-    if (attrs.maxLength) {
+    if (attrs.maxLength !== undefined) {
         element.setMaxLength(attrs.maxLength);
     }
-    if (attrs.value) {
+    if (attrs.value !== undefined) {
         element.setText(attrs.value);
     }
     if (attrs.type) {
