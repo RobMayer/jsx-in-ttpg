@@ -268,7 +268,7 @@ const createElement = <const T extends keyof JSX.IntrinsicElements>(tag: T, attr
         case "text":
             return textElement(attrs as JSX.IntrinsicElements["text"], ensureStrings(...children));
         case "button":
-            return buttonElement(attrs as JSX.IntrinsicElements["button"]);
+            return buttonElement(attrs as JSX.IntrinsicElements["button"], ensureStrings(...children));
         case "checkbox":
             return checkboxElement(attrs as JSX.IntrinsicElements["checkbox"]);
         case "textarea":
