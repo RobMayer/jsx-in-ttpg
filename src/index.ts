@@ -44,7 +44,7 @@ type BoxChild<T> = {
 
 type IColor = Color | [number, number, number, number] | string;
 
-export const hexToColor = (h: string, pow: number = 1) => {
+const hexToColor = (h: string, pow: number = 1) => {
     h = h.slice(1);
     if (h.length === 3) {
         h = h + "f";
@@ -71,12 +71,15 @@ const isColor = (c: any): c is Color => {
     return typeof c?.r === "number" && typeof c?.g === "number" && typeof c?.b === "number" && typeof c?.a === "number";
 };
 
-const parseColor = (value: IColor) => {
+export const parseColor = (value: IColor) => {
     if (isColor(value)) {
         return value;
     }
     if (Array.isArray(value)) {
-        return new Color(value[0], value[1], value[2], value[3]);
+        if (value.length === 4) {
+            return new Color(value[0], value[1], value[2], value[3]);
+        }
+        return undefined;
     }
     if (value.startsWith("#")) {
         return hexToColor(value);
@@ -143,28 +146,7 @@ export const canvasChild = ({ x, y, width, height }: { x: number; y: number; wid
     };
 };
 
-/* prettier-ignore */
-export type JsxInTTPGElement<T extends Widget> = 
-    T extends Canvas ? JSX.IntrinsicElements["canvas"] : 
-    T extends ImageWidget ? JSX.IntrinsicElements["image"] : 
-    T extends ImageButton ? JSX.IntrinsicElements["imagebutton"] : 
-    T extends ContentButton ? JSX.IntrinsicElements["contentbutton"] : 
-    T extends Border ? JSX.IntrinsicElements["border"] : 
-    T extends HorizontalBox ? JSX.IntrinsicElements["horizontalbox"] : 
-    T extends VerticalBox ? JSX.IntrinsicElements["verticalbox"] : 
-    T extends LayoutBox ? JSX.IntrinsicElements["layout"] : 
-    T extends Text ? JSX.IntrinsicElements["text"] : 
-    T extends Button ? JSX.IntrinsicElements["button"] : 
-    T extends CheckBox ? JSX.IntrinsicElements["checkbox"] : 
-    T extends MultilineTextBox ? JSX.IntrinsicElements["textarea"] : 
-    T extends ProgressBar ? JSX.IntrinsicElements["progressbar"] : 
-    T extends RichText ? JSX.IntrinsicElements["richtext"] : 
-    T extends SelectionBox ? JSX.IntrinsicElements["select"] : 
-    T extends Slider ? JSX.IntrinsicElements["slider"] : 
-    T extends TextBox ? JSX.IntrinsicElements["input"] : 
-    T extends WebBrowser ? JSX.IntrinsicElements["browser"] : 
-    T extends WidgetSwitcher ? JSX.IntrinsicElements["switch"] : 
-never;
+export type JSXAttributes<T extends keyof JSX.IntrinsicElements> = JSX.IntrinsicElements[T];
 
 const ensureWidgets = (...children: PossibleChildren[]): Widget[] => {
     return children.reduce<Widget[]>((acc, child) => {
@@ -286,9 +268,9 @@ const createElement = <const T extends keyof JSX.IntrinsicElements>(tag: T, attr
         case "text":
             return textElement(attrs as JSX.IntrinsicElements["text"], ensureStrings(...children));
         case "button":
-            return buttonElement(attrs as JSX.IntrinsicElements["button"], ensureStrings(...children));
+            return buttonElement(attrs as JSX.IntrinsicElements["button"]);
         case "checkbox":
-            return checkboxElement(attrs as JSX.IntrinsicElements["checkbox"], ensureStrings(...children));
+            return checkboxElement(attrs as JSX.IntrinsicElements["checkbox"]);
         case "textarea":
             return textareaElement(attrs as JSX.IntrinsicElements["textarea"], ensureStrings(...children));
         case "progressbar":
@@ -582,13 +564,16 @@ const buttonElement = (attrs: JSX.IntrinsicElements["button"], children?: string
     if (attrs.onClick) {
         element.onClicked.add(attrs.onClick);
     }
+    if (attrs.justify) {
+        element.setJustification(attrs.justify);
+    }
     if (children) {
         element.setText(children?.join(""));
     }
     return element;
 };
 
-const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"], children?: string[]) => {
+const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"]) => {
     const element = new CheckBox();
     doTextlike(element, attrs);
     if (attrs.label !== undefined) {
@@ -603,9 +588,6 @@ const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"], children?: st
     }
     if (attrs.onChangeActual) {
         element.onCheckStateChanged.add(attrs.onChangeActual);
-    }
-    if (children && children.length > 0) {
-        element.setText(children?.join(""));
     }
     element.setIsChecked(!!attrs.checked);
     return element;
@@ -643,6 +625,12 @@ const textareaElement = (attrs: JSX.IntrinsicElements["textarea"], children?: st
 const progressbarElement = (attrs: JSX.IntrinsicElements["progressbar"]) => {
     const element = new ProgressBar();
     doTextlike(element, attrs);
+    if (attrs.barColor) {
+        const t = parseColor(attrs.barColor);
+        if (t) {
+            element.setBarColor(t);
+        }
+    }
     if (attrs.label) {
         element.setText(Array.isArray(attrs.label) ? attrs.label.join("") : attrs.label);
     }
@@ -925,6 +913,7 @@ declare global {
                 color?: IColor;
                 onClick?: (button: Button, player: Player) => void;
                 children?: TextNode;
+                justify?: TextJustification;
             } & (
                 | { font?: string }
                 | {
@@ -944,7 +933,7 @@ declare global {
                 onChangeActual?: (checkbox: CheckBox, player: Player | undefined, state: boolean) => void;
                 checked?: boolean;
                 label?: string | string[];
-                children?: TextNode;
+                children?: never;
             } & (
                 | { font?: string }
                 | {
@@ -983,6 +972,7 @@ declare global {
                 wrap?: boolean;
                 size?: number;
                 color?: IColor;
+                barColor?: IColor;
                 value?: number;
                 label?: string | string[];
                 children?: never;
