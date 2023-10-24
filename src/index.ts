@@ -361,7 +361,7 @@ const doImagelike = <T extends ImageButton | ImageWidget>(element: T, attrs: Ima
     if ("card" in attrs && attrs.card) {
         element.setSourceCard(attrs.card);
     }
-    element.setImageSize(attrs?.width ?? 0, attrs?.height ?? 0);
+    element.setImageSize(attrs?.width, attrs?.height);
 };
 
 type CommonElement<T extends Widget> = {
