@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@tabletop-playground/api':
-    specifier: ^0.37.0
-    version: 0.37.1
+    specifier: ^0.38.0
+    version: 0.38.0
 
 devDependencies:
   tsup:
@@ -268,8 +268,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@tabletop-playground/api@0.37.1:
-    resolution: {integrity: sha512-a73UfgbTPmKS3jQZx3Si3BZS6QBNOE9lH6Rl8VcvzlHd7MHWpwoGqkvEW49EVWkj5JgQmTIBjCFfWDpIZ6l7qQ==}
+  /@tabletop-playground/api@0.38.0:
+    resolution: {integrity: sha512-KAPg2h2AiXnSzGNxGFiSzOXIozt+RKH0WcmYwsBj3LAF1sQ6tzRTfu1IR4OwK0/8cXhyY1ke7X8HlGy9DWOs2w==}
     dev: false
 
   /any-promise@1.3.0:
