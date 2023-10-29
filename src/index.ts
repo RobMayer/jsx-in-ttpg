@@ -1073,9 +1073,9 @@ declare global {
                 ref?: RefValue<WebBrowser>;
                 disabled?: boolean;
                 hidden?: boolean;
-                onLoadStart?: () => void;
-                onLoadFinish?: () => void;
-                onChange?: () => void;
+                onLoadStart?: (el: WebBrowser) => void;
+                onLoadFinish?: (el: WebBrowser, success: boolean) => void;
+                onChange?: (el: WebBrowser, url: string) => void;
                 url?: string;
                 children?: never;
             };
