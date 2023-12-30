@@ -552,7 +552,7 @@ const textElement = (attrs: JSX.IntrinsicElements["text"], children?: string[]) 
         element.setText(children?.join(""));
     }
     element.setAutoWrap(!!attrs.wrap);
-    if (attrs.justify) {
+    if (attrs.justify !== undefined) {
         element.setJustification(attrs.justify);
     }
     return element;
@@ -564,7 +564,7 @@ const buttonElement = (attrs: JSX.IntrinsicElements["button"], children?: string
     if (attrs.onClick) {
         element.onClicked.add(attrs.onClick);
     }
-    if (attrs.justify) {
+    if (attrs.justify !== undefined) {
         element.setJustification(attrs.justify);
     }
     if (children) {
@@ -647,7 +647,7 @@ const richtextElement = (attrs: JSX.IntrinsicElements["richtext"], children?: st
         element.setText(children?.join("\n"));
     }
     element.setAutoWrap(!!attrs.wrap);
-    if (attrs.justify) {
+    if (attrs.justify !== undefined) {
         element.setJustification(attrs.justify);
     }
     return element;

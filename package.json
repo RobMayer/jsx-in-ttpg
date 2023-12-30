@@ -1,7 +1,7 @@
 {
     "name": "jsx-in-ttpg",
     "license": "UNLICENSE",
-    "version": "2.2.1",
+    "version": "2.2.2",
     "scripts": {
         "build": "tsup src/index.ts --format cjs,esm --dts --no-splitting",
         "clean": "rm -rf ./dist",
