@@ -589,6 +589,9 @@ const checkboxElement = (attrs: JSX.IntrinsicElements["checkbox"]) => {
     if (attrs.onChangeActual) {
         element.onCheckStateChanged.add(attrs.onChangeActual);
     }
+    if (attrs.transparent) {
+        element.setBackgroundTransparent(true);
+    }
     element.setIsChecked(!!attrs.checked);
     return element;
 };
@@ -929,6 +932,7 @@ declare global {
                 italic?: boolean;
                 size?: number;
                 color?: IColor;
+                transparent?: boolean;
                 onChange?: (checkbox: CheckBox, player: Player, state: boolean) => void;
                 onChangeActual?: (checkbox: CheckBox, player: Player | undefined, state: boolean) => void;
                 checked?: boolean;
