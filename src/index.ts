@@ -612,6 +612,9 @@ const textareaElement = (attrs: JSX.IntrinsicElements["textarea"], children?: st
     if (attrs.onChangeActual) {
         element.onTextChanged.add(attrs.onChangeActual);
     }
+    if (attrs.maxLength !== undefined) {
+        element.setMaxLength(attrs.maxLength);
+    }
     if (attrs.onCommit) {
         element.onTextCommitted.add((s, p, v) => {
             if (p !== undefined) {
