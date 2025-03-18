@@ -240,12 +240,7 @@ export const jsxInTTPG = (tag: ((props: any) => Widget) | keyof JSX.IntrinsicEle
     return element;
 };
 
-export const jsxFrag = (props?: { [key: string]: any }, ...children: PossibleChildren[]): PossibleChildren | PossibleChildren[] => {
-    if (children.length === 1) {
-        return children[0];
-    }
-    return children;
-};
+export const jsxFrag = (props?: { [key: string]: any }, ...children: PossibleChildren[]): PossibleChildren[] => children;
 
 const createElement = <const T extends keyof JSX.IntrinsicElements>(tag: T, attrs: { [key: string]: any }, children: PossibleChildren[]) => {
     switch (tag) {
@@ -791,6 +786,7 @@ const INPUT_TYPES = {
 declare global {
     namespace JSX {
         type Element = Widget | ArrayOr<string | undefined | null | boolean | number>;
+        type ElementAry = Element | Element[];
         interface ElementChildrenAttribute {
             children: {};
         }
@@ -849,7 +845,7 @@ declare global {
                 ref?: RefValue<Canvas>;
                 disabled?: boolean;
                 hidden?: boolean;
-                children?: ArrayOr<CanvasChild<JSX.Element>>;
+                children?: ArrayOr<CanvasChild<JSX.ElementAry>>;
             };
             horizontalbox: {
                 ref?: RefValue<HorizontalBox>;
@@ -858,7 +854,7 @@ declare global {
                 gap?: number;
                 valign?: VerticalAlignment;
                 halign?: HorizontalAlignment;
-                children?: ArrayOr<JSX.Element | BoxChild<JSX.Element>>;
+                children?: ArrayOr<JSX.ElementAry | BoxChild<JSX.ElementAry>>;
             };
             verticalbox: {
                 ref?: RefValue<VerticalBox>;
@@ -867,7 +863,7 @@ declare global {
                 gap?: number;
                 valign?: VerticalAlignment;
                 halign?: HorizontalAlignment;
-                children?: ArrayOr<JSX.Element | BoxChild<JSX.Element>>;
+                children?: ArrayOr<JSX.ElementAry | BoxChild<JSX.ElementAry>>;
             };
             layout: {
                 ref?: RefValue<LayoutBox>;
